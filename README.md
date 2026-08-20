@@ -2,7 +2,6 @@
 
 A production-grade Learning Management System engineered for scalability, real-time interactivity, and high availability. 
 
-> **Author:** Smruti Sourav Sahoo
 
 ## System Architecture & Technical Stack
 
