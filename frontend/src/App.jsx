@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { BookOpen, LogOut } from 'lucide-react';
 import Catalog from './pages/Catalog';
 import CoursePlayer from './pages/CoursePlayer';
@@ -42,20 +42,29 @@ const Navbar = () => {
   );
 };
 
+const AppLayout = () => {
+  const location = useLocation();
+  const isFullPage = location.pathname.startsWith('/course') || location.pathname === '/auth';
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background text-on-background">
+      {!isFullPage && <Navbar />}
+      <main className={`flex-grow w-full ${!isFullPage ? 'container mx-auto px-4 py-8 max-w-7xl' : ''}`}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/auth" replace />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/catalog" element={<Catalog />} />
+          <Route path="/course/:slug" element={<CoursePlayer />} />
+        </Routes>
+      </main>
+    </div>
+  );
+};
+
 const App = () => {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <Navbar />
-        <main className="flex-grow container mx-auto px-4 py-8 max-w-7xl">
-          <Routes>
-            <Route path="/" element={<div className="text-center mt-20"><h1 className="text-4xl font-bold">Welcome to the LMS</h1></div>} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/catalog" element={<Catalog />} />
-            <Route path="/course/:slug" element={<CoursePlayer />} />
-          </Routes>
-        </main>
-      </div>
+      <AppLayout />
     </Router>
   );
 };

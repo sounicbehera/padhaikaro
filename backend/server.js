@@ -18,7 +18,7 @@ const httpServer = createServer(app);
 // Socket.io setup
 const io = new Server(httpServer, {
   cors: {
-    origin: '*', // In production, restrict to frontend URL
+    origin: '*', 
     methods: ['GET', 'POST']
   }
 });
