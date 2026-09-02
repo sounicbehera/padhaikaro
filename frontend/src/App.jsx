@@ -4,6 +4,7 @@ import { BookOpen, LogOut } from 'lucide-react';
 import Catalog from './pages/Catalog';
 import CoursePlayer from './pages/CoursePlayer';
 import Auth from './pages/Auth';
+import Landing from './pages/Landing';
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
@@ -44,14 +45,14 @@ const Navbar = () => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const isFullPage = location.pathname.startsWith('/course') || location.pathname === '/auth';
+  const isFullPage = location.pathname.startsWith('/course') || location.pathname === '/auth' || location.pathname === '/';
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-on-background">
+    <div className="min-h-screen w-full flex flex-col bg-background text-on-background">
       {!isFullPage && <Navbar />}
       <main className={`flex-grow w-full ${!isFullPage ? 'container mx-auto px-4 py-8 max-w-7xl' : ''}`}>
         <Routes>
-          <Route path="/" element={<Navigate to="/auth" replace />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/course/:slug" element={<CoursePlayer />} />
