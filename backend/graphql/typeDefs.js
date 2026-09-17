@@ -35,6 +35,7 @@ const typeDefs = `#graphql
     title: String!
     content: String
     videoUrl: String
+    pdfUrl: String
     duration: Int
     quizId: ID
   }
@@ -58,6 +59,7 @@ const typeDefs = `#graphql
     me: User
     getCourses(category: String, level: String): [Course]
     getCourse(slug: String!): Course
+    getMyCourses: [Course]
     getMyEnrollments: [Enrollment]
   }
 
@@ -69,7 +71,12 @@ const typeDefs = `#graphql
     publishCourse(courseId: ID!): Course
     
     createModule(courseId: ID!, title: String!, order: Int!): Module
-    createLesson(moduleId: ID!, title: String!, content: String, videoUrl: String, duration: Int): Lesson
+    updateModule(moduleId: ID!, title: String!, order: Int): Module
+    deleteModule(courseId: ID!, moduleId: ID!): Boolean
+    
+    createLesson(moduleId: ID!, title: String!, content: String, videoUrl: String, pdfUrl: String, duration: Int): Lesson
+    updateLesson(lessonId: ID!, title: String, content: String, videoUrl: String, pdfUrl: String, duration: Int): Lesson
+    deleteLesson(moduleId: ID!, lessonId: ID!): Boolean
     
     enrollStudent(courseId: ID!): Enrollment
     markLessonComplete(enrollmentId: ID!, lessonId: ID!): Enrollment

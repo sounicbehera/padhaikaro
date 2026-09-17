@@ -4,6 +4,7 @@ const lessonSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String }, // Markdown content or notes
   videoUrl: { type: String },
+  pdfUrl: { type: String },
   duration: { type: Number }, // Duration in minutes
   quizId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' }
 }, { timestamps: true });

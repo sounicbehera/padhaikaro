@@ -34,6 +34,13 @@ const resolvers = {
         path: 'course',
         populate: { path: 'instructor' }
       }).populate('completedLessons');
+    },
+    getMyCourses: async (_, __, { user }) => {
+      checkRole(user, ['Instructor', 'Admin']);
+      return Course.find({ instructor: user._id }).populate('instructor').populate({
+        path: 'modules',
+        populate: { path: 'lessons' }
+      });
     }
   },
   Mutation: {
@@ -84,6 +91,19 @@ const resolvers = {
       await Course.findByIdAndUpdate(courseId, { $push: { modules: module._id } });
       return module;
     },
+    updateModule: async (_, { moduleId, title, order }, { user }) => {
+      checkRole(user, ['Instructor', 'Admin']);
+      const updates = {};
+      if (title !== undefined) updates.title = title;
+      if (order !== undefined) updates.order = order;
+      return await Module.findByIdAndUpdate(moduleId, updates, { new: true });
+    },
+    deleteModule: async (_, { courseId, moduleId }, { user }) => {
+      checkRole(user, ['Instructor', 'Admin']);
+      await Course.findByIdAndUpdate(courseId, { $pull: { modules: moduleId } });
+      await Module.findByIdAndDelete(moduleId);
+      return true;
+    },
     createLesson: async (_, { moduleId, ...args }, { user }) => {
       checkRole(user, ['Instructor', 'Admin']);
       const lesson = new Lesson(args);
@@ -91,6 +111,16 @@ const resolvers = {
       
       await Module.findByIdAndUpdate(moduleId, { $push: { lessons: lesson._id } });
       return lesson;
+    },
+    updateLesson: async (_, { lessonId, ...args }, { user }) => {
+      checkRole(user, ['Instructor', 'Admin']);
+      return await Lesson.findByIdAndUpdate(lessonId, args, { new: true });
+    },
+    deleteLesson: async (_, { moduleId, lessonId }, { user }) => {
+      checkRole(user, ['Instructor', 'Admin']);
+      await Module.findByIdAndUpdate(moduleId, { $pull: { lessons: lessonId } });
+      await Lesson.findByIdAndDelete(lessonId);
+      return true;
     },
     enrollStudent: async (_, { courseId }, { user }) => {
       checkAuth(user);

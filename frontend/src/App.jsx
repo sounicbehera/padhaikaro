@@ -6,8 +6,20 @@ import CoursePlayer from './pages/CoursePlayer';
 import Auth from './pages/Auth';
 import Landing from './pages/Landing';
 
+import AdminDashboard from './pages/AdminDashboard';
+import AdminCourseEditor from './pages/AdminCourseEditor';
+
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const token = localStorage.getItem('token');
+  const [isAuthenticated, setIsAuthenticated] = useState(!!token);
+  
+  let userRole = null;
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      userRole = payload.role;
+    } catch(e) {}
+  }
   
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -15,24 +27,31 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav className="bg-surface-container shadow-sm border-b border-outline-variant">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <Link to="/" className="flex items-center space-x-2">
-            <BookOpen className="h-8 w-8 text-brand-600" />
-            <span className="font-bold text-xl text-gray-900">LMS Platform</span>
+            <BookOpen className="h-8 w-8 text-primary" />
+            <span className="font-bold text-xl text-on-surface">LMS Platform</span>
           </Link>
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
-              <button 
-                onClick={handleLogout}
-                className="flex items-center space-x-1 text-gray-600 hover:text-red-600 transition"
-              >
-                <LogOut className="h-5 w-5" />
-                <span>Logout</span>
-              </button>
+              <>
+                {(userRole === 'Instructor' || userRole === 'Admin') && (
+                  <Link to="/admin" className="text-primary font-medium hover:underline">
+                    Admin Panel
+                  </Link>
+                )}
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center space-x-1 text-on-surface-variant hover:text-error transition"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span>Logout</span>
+                </button>
+              </>
             ) : (
-              <Link to="/auth" className="px-4 py-2 rounded-md bg-brand-600 text-white font-medium hover:bg-brand-700 transition">
+              <Link to="/auth" className="px-4 py-2 rounded-md bg-primary text-on-primary font-medium hover:bg-primary/90 transition">
                 Sign In
               </Link>
             )}
@@ -45,7 +64,7 @@ const Navbar = () => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const isFullPage = location.pathname.startsWith('/course') || location.pathname === '/auth' || location.pathname === '/';
+  const isFullPage = location.pathname.startsWith('/course/') || location.pathname === '/auth' || location.pathname === '/';
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background text-on-background">
@@ -56,6 +75,8 @@ const AppLayout = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/course/:slug" element={<CoursePlayer />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/course/:slug" element={<AdminCourseEditor />} />
         </Routes>
       </main>
     </div>
