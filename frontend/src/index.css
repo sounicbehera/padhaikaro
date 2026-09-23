@@ -58,6 +58,17 @@
   --spacing-unit-xl: 48px;
   --spacing-unit-sm: 8px;
   --spacing-unit-xs: 4px;
+
+  /* Fluid Typography using clamp() */
+  --text-headline-lg-mobile: clamp(1.75rem, 4vw, 2.5rem);
+  --text-headline-lg: clamp(2rem, 5vw, 3.5rem);
+  --text-headline-md: clamp(1.5rem, 3vw, 2.25rem);
+  --text-headline-sm: clamp(1.25rem, 2.5vw, 1.75rem);
+  --text-body-lg: clamp(1rem, 2vw, 1.25rem);
+  --text-body-md: clamp(0.875rem, 1.5vw, 1rem);
+  --text-body-sm: clamp(0.75rem, 1.2vw, 0.875rem);
+  --text-label-md: clamp(0.75rem, 1.2vw, 0.875rem);
+  --text-label-sm: 0.75rem;
 }
 
 body {

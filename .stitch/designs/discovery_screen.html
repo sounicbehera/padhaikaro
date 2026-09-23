@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DevSkill LMS - Course Discovery</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-on-surface": "#313030",
+            "on-tertiary-fixed-variant": "#723600",
+            "on-secondary-container": "#d6e5ff",
+            "on-tertiary": "#502400",
+            "primary-fixed-dim": "#adc6ff",
+            "on-error-container": "#ffdad6",
+            "on-secondary": "#00315d",
+            "secondary-fixed": "#d4e3ff",
+            "on-secondary-fixed-variant": "#004883",
+            "surface-bright": "#393939",
+            "primary-fixed": "#d8e2ff",
+            "on-surface-variant": "#c2c6d6",
+            "surface-variant": "#353534",
+            "outline-variant": "#424754",
+            "on-tertiary-container": "#461f00",
+            "surface-container-high": "#2a2a2a",
+            "surface-container": "#201f1f",
+            "surface-dim": "#131313",
+            "tertiary-fixed-dim": "#ffb786",
+            "surface-tint": "#adc6ff",
+            "inverse-surface": "#e5e2e1",
+            "surface": "#131313",
+            "primary-container": "#4d8eff",
+            "error": "#ffb4ab",
+            "on-primary-fixed-variant": "#004395",
+            "error-container": "#93000a",
+            "tertiary-fixed": "#ffdcc6",
+            "on-background": "#e5e2e1",
+            "on-error": "#690005",
+            "secondary-fixed-dim": "#a4c9ff",
+            "on-primary-fixed": "#001a42",
+            "primary": "#adc6ff",
+            "secondary": "#a4c9ff",
+            "tertiary-container": "#df7412",
+            "tertiary": "#ffb786",
+            "surface-container-low": "#1c1b1b",
+            "on-tertiary-fixed": "#311400",
+            "on-primary-container": "#00285d",
+            "on-primary": "#002e6a",
+            "on-surface": "#e5e2e1",
+            "secondary-container": "#0267b8",
+            "on-secondary-fixed": "#001c39",
+            "outline": "#8c909f",
+            "background": "#131313",
+            "surface-container-lowest": "#0e0e0e",
+            "surface-container-highest": "#353534",
+            "inverse-primary": "#005ac2"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "margin": "2rem",
+            "gutter": "1.5rem",
+            "space-lg": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2.5rem"
+          },
+          "fontFamily": {
+            "display-lg": ["Geist"],
+            "label-md": ["JetBrains Mono"],
+            "headline-md": ["Geist"],
+            "body-sm": ["Geist"],
+            "body-lg": ["Geist"],
+            "display-lg-mobile": ["Geist"],
+            "headline-sm": ["Geist"],
+            "headline-lg": ["Geist"],
+            "body-md": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "headline-lg-mobile": ["Geist"]
+          },
+          "fontSize": {
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.005em", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "500" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-primary-container/30 selection:text-primary">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface-container-low dark:bg-surface-container-low docked full-width top-0 sticky z-50 border-b border-outline-variant/30 flat no shadows">
+<div class="flex items-center justify-between px-space-lg h-16 w-full max-w-[1440px] mx-auto">
+<!-- Left: Logo & Top Links -->
+<div class="flex items-center gap-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary" data-icon="terminal">terminal</span>
+<span class="text-headline-sm font-headline-sm text-on-surface dark:text-on-surface tracking-tight font-semibold">DevSkill LMS</span>
+<span class="font-label-sm text-label-sm bg-surface-container text-primary px-space-xs py-0.5 rounded-sm border border-outline-variant/30">PRO</span>
+</div>
+<nav class="hidden md:flex items-center gap-space-md">
+<!-- Catalog is Active -->
+<a class="text-primary dark:text-primary font-medium border-b-2 border-primary pb-1 font-body-md text-body-md transition-all duration-150 active:opacity-90" href="#">Catalog</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-normal hover:text-on-surface transition-colors font-body-md text-body-md" href="#">My Learning</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-normal hover:text-on-surface transition-colors font-body-md text-body-md" href="#">Certifications</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-normal hover:text-on-surface transition-colors font-body-md text-body-md" href="#">Community</a>
+</nav>
+</div>
+<!-- Right: Search Bar & Utility Cluster -->
+<div class="flex items-center gap-space-md">
+<!-- Search with shortcut badge -->
+<div class="relative hidden sm:flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline text-[18px]" data-icon="search">search</span>
+<input class="bg-surface-container border border-outline-variant/40 rounded-xl pl-9 pr-12 py-1.5 text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary w-64 transition-all" placeholder="Search courses, skills..." type="text"/>
+<kbd class="absolute right-2.5 font-label-sm text-label-sm text-outline border border-outline-variant/40 rounded px-1.5 py-0.5 bg-surface-container-high">⌘K</kbd>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-xl transition-colors duration-150 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary-container"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-xl transition-colors duration-150">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+</button>
+<div class="h-6 w-[1px] bg-outline-variant/30 mx-1"></div>
+<button class="px-space-md py-1.5 font-label-md text-label-md rounded-xl bg-surface-container-high hover:bg-surface-variant text-on-surface border border-outline-variant/40 transition-colors">Sign In</button>
+<button class="px-space-md py-1.5 font-label-md text-label-md rounded-xl bg-primary-container text-on-primary-container font-medium hover:opacity-95 transition-opacity">Go Pro</button>
+<img alt="User profile photo" class="w-8 h-8 rounded-full border border-outline-variant/40 object-cover" data-alt="A clean portrait headshot of a software engineer wearing a modern dark slate sweater with ambient neon cyan backlighting against a dark minimalist studio backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCJv5Dm-LjaiV0AP4voxWVVXgbl0xNK5DztJuYD2zXITTNi0RfAJ3Pg-g82jMSTAiUEZUHpjwRjifCiyxjcViJ1-8zYqeP0SoBqf9_J2k6C415mQZTU9uuj50Ihk5JvDCK33HJCCQMjwYsGkYhZI5nY1e_IKAGh5XO3Gh0At76oTB5oCg1hn_cOHfhCauziEMp6A6fMA2U8xrrosRiRwouGlwGPg5L5v_xnL2gfFK9UuZklw9ufSZ4oIEAPoHSeyFM0L-KtWOP6bqt"/>
+</div>
+</div>
+</header>
+<!-- Page Body Container -->
+<div class="flex-1 w-full max-w-[1440px] mx-auto px-space-lg py-space-lg flex gap-space-lg">
+<!-- Left SideNavBar / Filters Area (Shared Component Blueprint) -->
+<aside class="hidden lg:flex flex-col w-[250px] shrink-0 border-r border-outline-variant/30 pr-space-md space-y-space-md sticky top-20 self-start">
+<!-- Filter Header -->
+<div class="flex items-center justify-between pb-space-sm border-b border-outline-variant/20">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="tune">tune</span>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Filters</h2>
+</div>
+<button class="font-label-sm text-label-sm text-outline hover:text-primary transition-colors duration-150">Reset All</button>
+</div>
+<!-- Categories Accordion / Filter List -->
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between py-1">
+<span class="font-headline-sm text-[15px] font-semibold text-on-surface">Categories</span>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="expand_more">expand_more</span>
+</div>
+<div class="space-y-2 pt-1 font-body-sm text-body-sm">
+<label class="flex items-center gap-2 cursor-pointer group text-on-surface">
+<input checked="" class="rounded border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="group-hover:text-primary transition-colors">Development</span>
+<span class="ml-auto font-label-sm text-label-sm text-outline">48</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group text-on-surface-variant">
+<input checked="" class="rounded border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="group-hover:text-primary transition-colors">Cloud &amp; DevOps</span>
+<span class="ml-auto font-label-sm text-label-sm text-outline">22</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group text-on-surface-variant">
+<input class="rounded border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="group-hover:text-primary transition-colors">Data Science</span>
+<span class="ml-auto font-label-sm text-label-sm text-outline">14</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group text-on-surface-variant">
+<input class="rounded border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="group-hover:text-primary transition-colors">Cybersecurity</span>
+<span class="ml-auto font-label-sm text-label-sm text-outline">9</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group text-on-surface-variant">
+<input class="rounded border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="group-hover:text-primary transition-colors">System Architecture</span>
+<span class="ml-auto font-label-sm text-label-sm text-outline">11</span>
+</label>
+</div>
+</div>
+<div class="h-[1px] bg-outline-variant/20"></div>
+<!-- Difficulty Level -->
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between py-1">
+<span class="font-headline-sm text-[15px] font-semibold text-on-surface">Difficulty</span>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="expand_more">expand_more</span>
+</div>
+<div class="space-y-2 pt-1 font-body-sm text-body-sm">
+<label class="flex items-center gap-2 cursor-pointer group text-on-surface-variant">
+<input class="rounded border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="group-hover:text-primary transition-colors">Beginner</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group text-on-surface">
+<input checked="" class="rounded border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="group-hover:text-primary transition-colors">Intermediate</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group text-on-surface">
+<input checked="" class="rounded border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<span class="group-hover:text-primary transition-colors">Advanced</span>
+</label>
+</div>
+</div>
+<div class="h-[1px] bg-outline-variant/20"></div>
+<!-- Price Range Filter -->
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between py-1">
+<span class="font-headline-sm text-[15px] font-semibold text-on-surface">Price Range</span>
+<span class="font-label-sm text-label-sm text-primary">$0 - $140</span>
+</div>
+<div class="pt-2">
+<input class="w-full accent-primary bg-surface-container h-1.5 rounded-lg appearance-none cursor-pointer" max="200" min="0" type="range" value="140"/>
+<div class="flex justify-between font-label-sm text-label-sm text-outline mt-1">
+<span>$0</span>
+<span>$200</span>
+</div>
+</div>
+<div class="pt-2">
+<label class="flex items-center justify-between cursor-pointer">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Free courses only</span>
+<input class="rounded border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+</label>
+</div>
+</div>
+<div class="h-[1px] bg-outline-variant/20"></div>
+<!-- Course Rating Filter -->
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between py-1">
+<span class="font-headline-sm text-[15px] font-semibold text-on-surface">Course Rating</span>
+</div>
+<div class="space-y-2 pt-1 font-body-sm text-body-sm">
+<label class="flex items-center gap-2 cursor-pointer text-on-surface">
+<input checked="" class="border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" name="rating_filter" type="radio"/>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star_half" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">4.5 &amp; up</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer text-on-surface-variant">
+<input class="border-outline-variant/40 bg-surface-container text-primary-container focus:ring-0 focus:ring-offset-0" name="rating_filter" type="radio"/>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star">star</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">4.0 &amp; up</span>
+</label>
+</div>
+</div>
+<!-- Side Nav Footer Links (from Shared JSON) -->
+<div class="pt-space-md border-t border-outline-variant/20 space-y-1">
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface rounded-lg px-space-sm py-space-xs font-body-sm text-body-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="bookmark">bookmark</span>
+<span>Saved Tracks</span>
+</a>
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface rounded-lg px-space-sm py-space-xs font-body-sm text-body-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="route">route</span>
+<span>Learning Paths</span>
+</a>
+</div>
+</aside>
+<!-- Main Course Discovery Content -->
+<main class="flex-1 min-w-0">
+<!-- Header & Results Meta -->
+<div class="flex flex-col md:flex-row md:items-center justify-between pb-space-md mb-space-md border-b border-outline-variant/20 gap-space-sm">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">Explore Engineering Courses</h1>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Showing <span class="text-primary font-medium">84 courses</span> with high-performance hands-on labs</p>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="text-body-sm font-body-sm text-outline">Sort By:</span>
+<div class="relative">
+<select class="bg-surface-container text-body-sm font-body-sm text-on-surface border border-outline-variant/40 rounded-xl px-3 py-1.5 pr-8 appearance-none focus:outline-none focus:border-primary cursor-pointer">
+<option>Most Popular</option>
+<option>Highest Rated</option>
+<option>Newest</option>
+<option>Price: Low to High</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2 text-outline pointer-events-none text-[18px]" data-icon="unfold_more">unfold_more</span>
+</div>
+</div>
+</div>
+<!-- Active Applied Filter Chips -->
+<div class="flex flex-wrap items-center gap-space-xs mb-space-lg">
+<span class="font-label-sm text-label-sm text-outline mr-1">Active filters:</span>
+<span class="inline-flex items-center gap-1 bg-surface-container border border-outline-variant/40 px-2.5 py-1 rounded-xl text-primary font-label-sm text-label-sm">
+          Development
+          <button class="hover:text-error ml-1 transition-colors"><span class="material-symbols-outlined text-[14px]" data-icon="close">close</span></button>
+</span>
+<span class="inline-flex items-center gap-1 bg-surface-container border border-outline-variant/40 px-2.5 py-1 rounded-xl text-primary font-label-sm text-label-sm">
+          Cloud &amp; DevOps
+          <button class="hover:text-error ml-1 transition-colors"><span class="material-symbols-outlined text-[14px]" data-icon="close">close</span></button>
+</span>
+<span class="inline-flex items-center gap-1 bg-surface-container border border-outline-variant/40 px-2.5 py-1 rounded-xl text-primary font-label-sm text-label-sm">
+          Advanced Level
+          <button class="hover:text-error ml-1 transition-colors"><span class="material-symbols-outlined text-[14px]" data-icon="close">close</span></button>
+</span>
+<button class="font-label-sm text-label-sm text-outline hover:text-primary underline ml-2 transition-colors">Clear all</button>
+</div>
+<!-- 3-Column Responsive Course Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-lg">
+<!-- Card 1: Distributed Systems -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/30 flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-150 group">
+<div class="relative aspect-video w-full overflow-hidden bg-surface-container">
+<img alt="Course thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Dark abstract visualization of interconnected server node mesh with glowing blue high-speed data packets flowing through geometric network lines in deep tech cyberspace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuRbv6uM_MmPCtRtDG0dvkEpOffd49OkMxaMqIgImVLkXOciqhHRZ1yYlApt6hYx_CVREQ1r4UqGYEl5ACa1uYlxoxsNxAQ2p60bBFmR0K5JjXdfTn0gwGSqIo_XHfsFW6qqX7AFv8fCVxpFZONJ7hvJWUmCxjkTc3vHb1kMgEpLs50C_JTYr1UV1j_ofLzOmTG6-YA4jb2FzS_FLWHiAAZLQq6cQxFlFBRwsvHbOeDNz92hbHnoTObODBhiMs_Li5KGC3a7ptNrF6"/>
+<div class="absolute top-2.5 left-2.5 flex gap-1.5">
+<span class="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2 py-0.5 rounded font-medium">BESTSELLER</span>
+</div>
+<div class="absolute bottom-2.5 right-2.5 bg-surface-container-lowest/80 backdrop-blur-sm px-2 py-0.5 rounded font-label-sm text-label-sm text-on-surface">
+              42h total
+            </div>
+</div>
+<div class="p-space-md flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<span class="font-label-sm text-label-sm text-primary uppercase">Advanced</span>
+<span class="text-outline text-xs">•</span>
+<span class="font-label-sm text-label-sm text-outline">Hands-on Labs</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                Distributed Systems &amp; Microservices at Scale
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 line-clamp-2">
+                Master consensus protocols, Raft, event streaming, and resilient microservice architectures for high throughput.
+              </p>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-outline-variant/20">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<img alt="Instructor Alex Rivers" class="w-6 h-6 rounded-full object-cover border border-outline-variant/40" data-alt="Professional studio portrait of an experienced software architect with glasses against a dark minimalist tech studio setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBU57oYeNmRQlBKCh1yYbqm_ZCwhDrwIS5nRNPEikaet5P53A9-vMTsy5bB_R9rFuVdiKkJqtHkZ9oeijFXhdVwZ79pMdwKVonid9wtC9ITG9q7ZDLAGWftwoGLM-Ye0zP950-DhjZwqSWkTzIGZQq4kRPND-1TQxrRzKZ4_f47rRv2Wa5bdkI_c8hblKJY6Ol91YvQH3IvHDhudn4dzzKtbiPWZfurtGt3LxyXqEBQ558uVsmmcxsriv5hQyOLgXzfSI3NX8UPHd9w"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Alex Rivers</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary">
+<span class="material-symbols-outlined text-[15px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-medium">4.9</span>
+<span class="text-outline">(1.4k)</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-headline-sm font-headline-sm text-on-surface">$129.99</span>
+<button class="bg-primary-container text-on-primary-container px-3.5 py-1.5 rounded-xl font-label-md text-label-md font-medium hover:opacity-90 transition-opacity">Enroll Now</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Modern Fullstack Rust -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/30 flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-150 group">
+<div class="relative aspect-video w-full overflow-hidden bg-surface-container">
+<img alt="Course thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Futuristic glowing code editor showing dark theme Rust syntax and WebAssembly compilation diagrams with electric blue and orange accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCKzfAoAAImLsLylbhrK1Kup8y3B1vQLvgZoY2wWzSg8_etJPFEZMVCXtVqhC-qOxd2usMCMIbKoVW4KYrIxxUeHO0oXg-oLXYK39PMxLC10f3d8PD-4mKJ5Z2wDRZCE5VnH7J421fyCQysbWeMV2aRFIuOAZfKbTwCdfwkkQ2kmKeuSoZ0PfZajjr9oUgZh9RXXBiusuq5g33iu4ErHR3vGrp1JTle7yKGW8fFfAiCBZaFl2cFrzAMJ2XDj9LYisZ2m0tFJqK7nOX"/>
+<div class="absolute top-2.5 left-2.5 flex gap-1.5">
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-2 py-0.5 rounded font-medium">NEW</span>
+</div>
+<div class="absolute bottom-2.5 right-2.5 bg-surface-container-lowest/80 backdrop-blur-sm px-2 py-0.5 rounded font-label-sm text-label-sm text-on-surface">
+              36h total
+            </div>
+</div>
+<div class="p-space-md flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<span class="font-label-sm text-label-sm text-primary uppercase">Intermediate</span>
+<span class="text-outline text-xs">•</span>
+<span class="font-label-sm text-label-sm text-outline">Full Stack</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                Modern Fullstack Rust &amp; WebAssembly
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 line-clamp-2">
+                Build blazingly fast full-stack applications with Rust, Axum, WebAssembly, and browser graphics concurrency.
+              </p>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-outline-variant/20">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<img alt="Instructor Elena Rostova" class="w-6 h-6 rounded-full object-cover border border-outline-variant/40" data-alt="Studio portrait of a female software engineering mentor smiling confidently against a dark ambient tech lighting environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2t6GRg8h0nTTNV4ais56AfLDHSt3c4J-ks-XCVhj-dgUKz-hrQSW2hj4KSQhZRo98JBzm1emGNYCthSc5J1kSL5tJYAum_U2THaE3dx9pld6MRBYJMbmtKJ-rXyWdi-ZBFwud5fFSh7c2DX3mTcw1piElA-B7zcKX6BvlJIv7sAH3VBFW8Eafc2XSmx6hSyXDhYEgdos7qYvY4h6UKjUCxtHT6W8hgHLtf_c3whtWXH7b18G84q1x_CX-JEGqUs6b2yhwdzj_CkJN"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Elena Rostova</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary">
+<span class="material-symbols-outlined text-[15px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-medium">4.8</span>
+<span class="text-outline">(890)</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-headline-sm font-headline-sm text-on-surface">$99.99</span>
+<button class="bg-primary-container text-on-primary-container px-3.5 py-1.5 rounded-xl font-label-md text-label-md font-medium hover:opacity-90 transition-opacity">Enroll Now</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3: Kubernetes in Production -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/30 flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-150 group">
+<div class="relative aspect-video w-full overflow-hidden bg-surface-container">
+<img alt="Course thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="High tech isometric diagram of multiple cloud containers being orchestrated in a dark virtualized Kubernetes cluster with deep blue and cyan light tracks." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG15tSk8ThlvBriNMO8N0WW26_TVPDVhdDnmjGKJiNQrY2UtTM-DQSqEHvTnsL4WZvu_aweQbOaHuQef2GWn_Z06AwOI7AxrEQPyjP5WwpTY7Xpxr5_UBX8GrOMnHDbu-_7xIrXkBh_98tiERr0vrkZc-0OqYJbZFZIxX-rK4D39MLjdc-ImhLU8nkV4F78ao4CYRZC7fYCbtHiaO7OkDrqC0AgPIpzdvVG-g7XOjqHFeBl5H3u8De3Dsppgso9tvNQqwRq0-TDTi0"/>
+<div class="absolute top-2.5 left-2.5 flex gap-1.5">
+<span class="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2 py-0.5 rounded font-medium">BESTSELLER</span>
+</div>
+<div class="absolute bottom-2.5 right-2.5 bg-surface-container-lowest/80 backdrop-blur-sm px-2 py-0.5 rounded font-label-sm text-label-sm text-on-surface">
+              28h total
+            </div>
+</div>
+<div class="p-space-md flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<span class="font-label-sm text-label-sm text-primary uppercase">Advanced</span>
+<span class="text-outline text-xs">•</span>
+<span class="font-label-sm text-label-sm text-outline">DevOps</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                Kubernetes in Production &amp; GitOps Workflows
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 line-clamp-2">
+                Deploy, monitor, and scale fault-tolerant clusters using ArgoCD, Prometheus, Helm, and zero-downtime canary updates.
+              </p>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-outline-variant/20">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<img alt="Instructor Marcus Chen" class="w-6 h-6 rounded-full object-cover border border-outline-variant/40" data-alt="Portrait of an Asian cloud infrastructure engineer wearing black headphones against an atmospheric low-light workstation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH9oWqG_OILJmsjPloDUrAmLvaEVa0p39YyMsGMCQpp2GIUj2Ln3ddXQamuTsFB9T0MT7yBv0FrNhAEmVZGE7ipvTQg418hIroDeEXW3nQXed8s3lERbRhjFT1r8eDZ5fxEBFehHkU31DbT41LA7K_4XtFOb1mrWXL-26jnrwikXXl-L6r3TOrUEFfUJTG6QygGQPDyl-DwJYLANjcvQ7kHtS7IWfCIt4zq8AjbAQqHXDa5ahDp0epJ-b4X_iKTrR9m0jYQSKYpc1z"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Marcus Chen</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary">
+<span class="material-symbols-outlined text-[15px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-medium">4.9</span>
+<span class="text-outline">(2.1k)</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-headline-sm font-headline-sm text-on-surface">$114.99</span>
+<button class="bg-primary-container text-on-primary-container px-3.5 py-1.5 rounded-xl font-label-md text-label-md font-medium hover:opacity-90 transition-opacity">Enroll Now</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4: High-Performance PostgreSQL -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/30 flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-150 group">
+<div class="relative aspect-video w-full overflow-hidden bg-surface-container">
+<img alt="Course thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Abstract complex relational schema representation with glowing fiber optic links over a black slate surface, symbolizing database architecture and indexing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2YHkfZijyVmankASjVYaCqeuUljfe1SsYmYFpIsgh0lLI8cEZxv1tGRB8-AUf0NsZ-3Dm2fDDxs8MCFtGcdGVbW_kXRXyhy_YncmlrPx-T_4pGyZWRDdSMovFNg4zwn-Y5Xb8lNlH87Yu2NhdVvBRYxcEtpNt3kzMfhuWlZqkFJdeux0QCtTWp-RZfj_0O3yCL587WK7tFmpBdOmEWUa33asamOfuP9fHwjjM8MSK7SjPdik3JjyOi6tAhmdB3OVWTnpfhiKgPa89"/>
+<div class="absolute bottom-2.5 right-2.5 bg-surface-container-lowest/80 backdrop-blur-sm px-2 py-0.5 rounded font-label-sm text-label-sm text-on-surface">
+              30h total
+            </div>
+</div>
+<div class="p-space-md flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<span class="font-label-sm text-label-sm text-primary uppercase">Advanced</span>
+<span class="text-outline text-xs">•</span>
+<span class="font-label-sm text-label-sm text-outline">Database</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                High-Performance PostgreSQL &amp; Data Modeling
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 line-clamp-2">
+                Deep dive into query execution plans, vacuuming, connection pool tuning, partition strategies, and locking internals.
+              </p>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-outline-variant/20">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<img alt="Instructor Dr. Aris Thorne" class="w-6 h-6 rounded-full object-cover border border-outline-variant/40" data-alt="Portrait of a distinguished technical professor and researcher with subtle rim lighting against a minimalist dark gray architectural backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABXGit2bmhhx_DTf2nATQXqkiP8AQbza8Qczv8mgZlfI4Pacw_u8lkVMFxKlWWccGkFj_oN6Ve1ue0zq2wPYKCW4w0c6g9e-quXiKrwtwq8Pl0YPLNt34pE4P8pW2vwQZPNlagr_74odbc9Y1B-aabU4g1c3SFibl8cHxDtNvhVEUTnXTzy3_SdtuptXUSelPGCgdE8UmJ4OmJoqp7BCx90vzlb1hOBJBO8g-xAjDJkwG3l-ccA9ugJCwAKVGkn0h2-HgFKVRgOSE-"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Dr. Aris Thorne</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary">
+<span class="material-symbols-outlined text-[15px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-medium">4.7</span>
+<span class="text-outline">(620)</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-headline-sm font-headline-sm text-on-surface">$89.99</span>
+<button class="bg-primary-container text-on-primary-container px-3.5 py-1.5 rounded-xl font-label-md text-label-md font-medium hover:opacity-90 transition-opacity">Enroll Now</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 5: Production Machine Learning Systems -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/30 flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-150 group">
+<div class="relative aspect-video w-full overflow-hidden bg-surface-container">
+<img alt="Course thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Futuristic neural network tensor visualization showing model deployment pipelines and data streams illuminated with subtle cyan and deep blue gradients on dark glass." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRNlJJuQGqDIsCx7H9F5or9pjsflx7DR2CXp7bBGIYR7EK77BRu2BKhXOY3W5O7NxbVIgVFLrFvGYRx2JFuFUWTA4JqYyAe4sfiQrsRFdZKMBnd04R7rBQA5JoRGMWwf9Exko9dNT8xVw3F0AAyEa4EfhS9EbvAV5lNZTokvOsAr76WBua2Mj9MUXYYR1w2gQpdPVxu93bWwytP1H1u5RWT5SKwoJZYc06emjYdJLxl16U-IeHCLD4xcXzqcfdgqSrgn4WZ2PkZcfP"/>
+<div class="absolute top-2.5 left-2.5 flex gap-1.5">
+<span class="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2 py-0.5 rounded font-medium">POPULAR</span>
+</div>
+<div class="absolute bottom-2.5 right-2.5 bg-surface-container-lowest/80 backdrop-blur-sm px-2 py-0.5 rounded font-label-sm text-label-sm text-on-surface">
+              48h total
+            </div>
+</div>
+<div class="p-space-md flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<span class="font-label-sm text-label-sm text-primary uppercase">Advanced</span>
+<span class="text-outline text-xs">•</span>
+<span class="font-label-sm text-label-sm text-outline">MLOps</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                Production Machine Learning Systems (MLOps)
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 line-clamp-2">
+                Build end-to-end model training, feature stores, drift detection pipelines, and high-throughput inference endpoints.
+              </p>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-outline-variant/20">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<img alt="Instructor Priya Sharma" class="w-6 h-6 rounded-full object-cover border border-outline-variant/40" data-alt="Headshot of a modern AI researcher and data scientist in a minimalist dark tech environment with calm professional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGrMOzKfo61_LAK-xD1ITJ2gtnYapayhuKjQ2yQsAre3QDkXeFAuqKwT0Qza3UHB6pB64Wh0wyrR5WxjGsc3-bvpfwEgvcBJwGlrDPZhND8hNiy9vsQC561-9md7GgCR_3vWeJDyjMjUWgRwv02edjcDezW0QbRrPXhOXo_CzytCimMfCVLEvvRws1is4tuj_Pf7b2nRZKkRR2vkgtI9UkllaRKG6BhhODtSMYTsty8iJxWa4iyuVRye0Lj3MHP14bdi1tQXH6cfYC"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Priya Sharma</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary">
+<span class="material-symbols-outlined text-[15px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-medium">4.9</span>
+<span class="text-outline">(1.8k)</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-headline-sm font-headline-sm text-on-surface">$139.99</span>
+<button class="bg-primary-container text-on-primary-container px-3.5 py-1.5 rounded-xl font-label-md text-label-md font-medium hover:opacity-90 transition-opacity">Enroll Now</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 6: Zero-Trust Security -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/30 flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-150 group">
+<div class="relative aspect-video w-full overflow-hidden bg-surface-container">
+<img alt="Course thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Cybersecurity digital fortress abstract visual with glowing cryptographic lock circuits and encrypted packet flows in dark monochrome with electric blue accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeNnhuNvRZsyB8a7YKa4asAGgUoBVw8nB3OG3lvkylJxqr_KuhaeHbC1-8jltFiozBrwvp8ZAQJMEY3zvgIuzhxYBPHQYxnY_a3Hz2f8AzK7AOjJuV4ijAzbJxM7kQw6AAkhxQ9uLZW6tFNd6dA0KKGqlyFoLEgTjlt2b1WAbRIJWvMTB5wrW11kWoYNOlye4--iwx7JCmwKON6LjggsfNkzeBs7ZeYHNLsWsiztmTA3ZYsfnOaKjq9OIAo3uu2AiXqm-ujTu-dK2O"/>
+<div class="absolute bottom-2.5 right-2.5 bg-surface-container-lowest/80 backdrop-blur-sm px-2 py-0.5 rounded font-label-sm text-label-sm text-on-surface">
+              22h total
+            </div>
+</div>
+<div class="p-space-md flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<span class="font-label-sm text-label-sm text-primary uppercase">Intermediate</span>
+<span class="text-outline text-xs">•</span>
+<span class="font-label-sm text-label-sm text-outline">Security</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                Zero-Trust Security &amp; Cloud Defense Architecture
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 line-clamp-2">
+                Implement identity-aware proxies, mTLS verification, IAM least-privilege automation, and enterprise threat modeling.
+              </p>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-outline-variant/20">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<img alt="Instructor David Vance" class="w-6 h-6 rounded-full object-cover border border-outline-variant/40" data-alt="Studio portrait of a cybersecurity engineer with clean black apparel against an engineered dark matte wall background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk2406MrX22zzAX3e0vj9NHPTZtQLVikwY0CRX3OnD7LrH5_Sp3bJnjRtLZvXN9WW59I0r3su7ZEZ3PbAOuSpK34t3qPDRHfzTMnoO50qqM_0e6CznbvwDYip2sy1g99TQVX91ewVF-YPAV7j4LtX2LuZEaaVkmJZYwAoGaaS8rN3T9pzVDnTX3nhRJdEHvYCWM6Ldk1q46S-64uhOfS4KvvRFqft4nJHhriUIC_i1odUVVJtP_DKPnN-SBrTy1Px6w93nXwGhX0Op"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">David Vance</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary">
+<span class="material-symbols-outlined text-[15px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-on-surface font-medium">4.8</span>
+<span class="text-outline">(450)</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-headline-sm font-headline-sm text-on-surface">$94.99</span>
+<button class="bg-primary-container text-on-primary-container px-3.5 py-1.5 rounded-xl font-label-md text-label-md font-medium hover:opacity-90 transition-opacity">Enroll Now</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Centered Pagination Bar -->
+<div class="mt-space-xl flex items-center justify-center gap-2">
+<button class="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_left">chevron_left</span>
+<span>Previous</span>
+</button>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 rounded-xl bg-primary-container text-on-primary-container font-label-md text-label-md font-semibold">1</button>
+<button class="w-8 h-8 rounded-xl border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container font-label-md text-label-md transition-colors">2</button>
+<button class="w-8 h-8 rounded-xl border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container font-label-md text-label-md transition-colors">3</button>
+<span class="px-1 text-outline font-label-md text-label-md">...</span>
+<button class="w-8 h-8 rounded-xl border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container font-label-md text-label-md transition-colors">8</button>
+</div>
+<button class="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors">
+<span>Next</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</main>
+</div>
+<!-- Footer (Shared Component Blueprint) -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest docked full-width bottom border-t border-outline-variant/20 flat no shadows mt-space-xl">
+<div class="flex flex-col md:flex-row justify-between items-center py-space-lg px-space-lg max-w-[1440px] mx-auto w-full gap-space-md font-body-sm text-body-sm">
+<div class="flex items-center gap-space-sm">
+<span class="text-headline-sm font-headline-sm text-on-surface dark:text-on-surface font-semibold tracking-tight">DevSkill LMS</span>
+<span class="text-outline">|</span>
+<span class="text-outline dark:text-outline">© 2025 DevSkill Technical Learning Inc. All rights reserved.</span>
+</div>
+<div class="flex flex-wrap items-center justify-center gap-x-space-md gap-y-2 font-label-sm text-label-sm">
+<a class="text-outline dark:text-outline hover:text-on-surface transition-colors" href="#">Documentation</a>
+<a class="text-outline dark:text-outline hover:text-on-surface transition-colors" href="#">Curriculum API</a>
+<a class="text-outline dark:text-outline hover:text-on-surface transition-colors" href="#">Enterprise Training</a>
+<a class="text-outline dark:text-outline hover:text-on-surface transition-colors" href="#">System Status</a>
+<a class="text-outline dark:text-outline hover:text-on-surface transition-colors" href="#">Terms of Service</a>
+<a class="text-outline dark:text-outline hover:text-on-surface transition-colors" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</body></html>

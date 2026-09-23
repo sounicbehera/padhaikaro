@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LMS Pro - Engineering Learning Platform Authentication</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: "#121212",
+                        surface: "#1E1E1E",
+                        "surface-dark": "#161616",
+                        "surface-border": "rgba(255, 255, 255, 0.08)",
+                        "brand-blue": "#2563EB",
+                        "brand-blue-hover": "#1D4ED8",
+                        "brand-blue-light": "#3B82F6",
+                        "text-primary": "#F3F4F6",
+                        "text-secondary": "#9CA3AF",
+                        "text-muted": "#6B7280"
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        display: ["Geist", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"]
+                    },
+                    boxShadow: {
+                        "glow-blue": "0 0 25px -4px rgba(37, 99, 235, 0.35)",
+                        "glow-blue-lg": "0 0 45px -8px rgba(59, 130, 246, 0.4)",
+                        "card-dark": "0 20px 50px rgba(0, 0, 0, 0.5)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .grid-bg {
+            background-size: 36px 36px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+        }
+        .form-floating-input:focus ~ .form-floating-label,
+        .form-floating-input:not(:placeholder-shown) ~ .form-floating-label {
+            transform: translateY(-1.1rem) scale(0.82);
+            color: #60A5FA;
+        }
+        .glow-accent {
+            filter: blur(80px);
+        }
+    </style>
+</head>
+<body class="bg-background text-text-primary min-h-screen flex flex-col lg:flex-row antialiased font-sans selection:bg-brand-blue selection:text-white">
+<!-- Left Side: Branded SaaS Tech Showcase (50% split) -->
+<div class="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 xl:p-16 overflow-hidden bg-[#0e0e11] border-r border-surface-border">
+<!-- Ambient Background Tech Glows -->
+<div class="absolute -top-32 -left-20 w-96 h-96 bg-brand-blue/20 rounded-full glow-accent pointer-events-none"></div>
+<div class="absolute bottom-10 right-0 w-[500px] h-[500px] bg-indigo-600/15 rounded-full glow-accent pointer-events-none"></div>
+<div class="absolute inset-0 grid-bg opacity-70 pointer-events-none"></div>
+<!-- Subtle Top Brand Header -->
+<div class="relative z-10 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-blue to-cyan-400 p-[1px] shadow-glow-blue">
+<div class="w-full h-full bg-[#141824] rounded-[11px] flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-blue-light text-[22px]">terminal</span>
+</div>
+</div>
+<div class="flex items-baseline gap-1.5">
+<span class="font-display text-2xl font-bold tracking-tight text-white">LMS<span class="text-brand-blue-light">Pro</span></span>
+<span class="text-[11px] font-mono uppercase tracking-widest text-text-muted px-1.5 py-0.5 rounded bg-white/5 border border-white/10">Enterprise</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-xs font-mono text-text-secondary bg-surface/70 px-3 py-1.5 rounded-full border border-white/5 backdrop-blur-md">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span>Systems Active • v3.8.4</span>
+</div>
+</div>
+<!-- Central High-Impact Value Proposition -->
+<div class="relative z-10 my-auto py-10 max-w-xl">
+<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-blue/10 border border-brand-blue/25 text-brand-blue-light text-xs font-medium mb-6">
+<span class="material-symbols-outlined text-sm">rocket_launch</span>
+<span>Next-Gen Learning Architecture</span>
+</div>
+<h1 class="font-display text-4xl xl:text-5xl font-bold text-white tracking-tight leading-[1.18] mb-5">
+                Empower your <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300">
+                    engineering journey.
+                </span>
+</h1>
+<p class="text-text-secondary text-base leading-relaxed mb-8 max-w-lg font-normal">
+                Master distributed systems, real-time architectures, and cloud-native workflows through production-grade sandbox simulations.
+            </p>
+<!-- Feature Bullet Highlights -->
+<div class="space-y-3.5 mb-10">
+<div class="flex items-center gap-3 text-sm text-gray-200">
+<div class="flex-shrink-0 w-6 h-6 rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-brand-blue-light">
+<span class="material-symbols-outlined text-[17px]">dataset</span>
+</div>
+<span>Interactive System Architecture &amp; Microservices Labs</span>
+</div>
+<div class="flex items-center gap-3 text-sm text-gray-200">
+<div class="flex-shrink-0 w-6 h-6 rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-brand-blue-light">
+<span class="material-symbols-outlined text-[17px]">groups</span>
+</div>
+<span>Real-time Peer Cohort Discussions &amp; Live Code Reviews</span>
+</div>
+<div class="flex items-center gap-3 text-sm text-gray-200">
+<div class="flex-shrink-0 w-6 h-6 rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-brand-blue-light">
+<span class="material-symbols-outlined text-[17px]">verified</span>
+</div>
+<span>Industry-Recognized Staff+ Engineering Certification</span>
+</div>
+</div>
+<!-- Authentic Testimonial Quote Card (Glassmorphic) -->
+<div class="bg-surface/60 backdrop-blur-xl border border-white/10 p-5 rounded-2xl shadow-card-dark relative overflow-hidden group">
+<div class="absolute -top-12 -right-12 w-24 h-24 bg-brand-blue/10 rounded-full glow-accent"></div>
+<div class="flex items-start gap-4">
+<div class="relative w-12 h-12 rounded-xl overflow-hidden border border-white/15 flex-shrink-0">
+<img alt="Sarah Jenkins" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbeKg2O1uEcGA4n5EKPqyZpxIIWBbuOE7dsWZ_nAlxT4LZlumO_CCvsykY9raVdKb1gPcr4iCY2Cx4M9cCANtyCt6Cl3kEMjF1acNl2XRbQIPSHzvUbMFvhOLTAin7REJRhinRWEGnnbndhNrOQGHeRV7D16MuWy6SPMaAkkLC3tPWuAfn2qgGwBfl14-9oDVQji_J8rQAQ8c58YVQE-dVwZSTBJk0bCaLfWOzTvtBCFCkOZ3hp8VZFw"/>
+</div>
+<div class="flex-1">
+<p class="text-sm italic text-gray-300 leading-relaxed mb-3">
+                            "The most focused engineering learning platform I've ever used. The interactive labs simulate real incidents with zero fluff."
+                        </p>
+<div class="flex items-center justify-between border-t border-white/5 pt-2.5">
+<div>
+<h4 class="text-xs font-semibold text-white">Sarah Jenkins</h4>
+<p class="text-[11px] text-text-secondary">Staff Infrastructure Engineer @ CloudScale</p>
+</div>
+<div class="flex items-center gap-1 text-amber-400">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Left Footer -->
+<div class="relative z-10 flex items-center justify-between text-xs text-text-muted">
+<p>© 2025 LMS Pro Platform, Inc. All rights reserved.</p>
+<div class="flex items-center gap-4">
+<span class="hover:text-text-secondary transition-colors cursor-pointer">Security Standards</span>
+<span>•</span>
+<span class="hover:text-text-secondary transition-colors cursor-pointer">SOC2 Type II</span>
+</div>
+</div>
+</div>
+<!-- Right Side: Centered Authentication Card (50% split) -->
+<div class="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 sm:p-10 lg:p-14 relative bg-background">
+<!-- Subtle Background Glow behind the card -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-blue/10 rounded-full glow-accent pointer-events-none"></div>
+<div class="w-full max-w-[440px] z-10">
+<!-- Mobile Brand Mark Header -->
+<div class="flex lg:hidden items-center justify-center gap-3 mb-8">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-blue to-cyan-400 p-[1px] shadow-glow-blue">
+<div class="w-full h-full bg-[#141824] rounded-[11px] flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-blue-light text-[22px]">terminal</span>
+</div>
+</div>
+<span class="font-display text-2xl font-bold tracking-tight text-white">LMS<span class="text-brand-blue-light">Pro</span></span>
+</div>
+<!-- Main Auth Card Container -->
+<div class="bg-surface/90 backdrop-blur-2xl border border-surface-border rounded-2xl p-7 sm:p-9 shadow-card-dark">
+<!-- Toggle Tabs with Blue Indicator -->
+<div class="grid grid-cols-2 p-1 bg-surface-dark/90 rounded-xl border border-white/5 mb-7">
+<button class="relative py-2.5 rounded-lg text-sm font-medium transition-all text-white bg-brand-blue shadow-glow-blue flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[17px]">login</span>
+<span>Sign In</span>
+</button>
+<button class="py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:text-white transition-colors flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[17px]">person_add</span>
+<span>Create Account</span>
+</button>
+</div>
+<!-- Header Title Inside Card -->
+<div class="mb-6">
+<h2 class="text-xl font-display font-semibold text-white tracking-tight">Welcome back</h2>
+<p class="text-xs text-text-secondary mt-1">Enter your credentials to access your workspaces</p>
+</div>
+<!-- Authentication Form -->
+<form class="space-y-4" onsubmit="event.preventDefault();">
+<!-- Email Field with pristine Floating Label -->
+<div class="relative">
+<input autocomplete="email" class="form-floating-input peer w-full bg-[#141414] text-white text-sm px-4 pt-6 pb-2 rounded-xl border border-white/10 hover:border-white/20 focus:border-brand-blue focus:ring-1 focus:ring-brand-blue focus:outline-none transition-all placeholder-transparent shadow-inner" id="email" placeholder="name@company.com" required="" type="email" value="sarah.jenkins@cloudscale.io"/>
+<label class="form-floating-label absolute left-4 top-4 text-xs text-text-muted font-medium pointer-events-none origin-[0] transition-all duration-200" for="email">
+                            Email address
+                        </label>
+</div>
+<!-- Password Field with Floating Label & Toggle -->
+<div class="relative">
+<input autocomplete="current-password" class="form-floating-input peer w-full bg-[#141414] text-white text-sm px-4 pt-6 pb-2 pr-11 rounded-xl border border-white/10 hover:border-white/20 focus:border-brand-blue focus:ring-1 focus:ring-brand-blue focus:outline-none transition-all placeholder-transparent shadow-inner" id="password" placeholder="••••••••••••" required="" type="password" value="EngineeringSecure2025!"/>
+<label class="form-floating-label absolute left-4 top-4 text-xs text-text-muted font-medium pointer-events-none origin-[0] transition-all duration-200" for="password">
+                            Password
+                        </label>
+<button class="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors" tabindex="-1" type="button">
+<span class="material-symbols-outlined text-[19px]">visibility</span>
+</button>
+</div>
+<!-- Remember me & Forgot Password -->
+<div class="flex items-center justify-between pt-1">
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input checked="" class="w-4 h-4 rounded border-white/20 bg-[#141414] text-brand-blue focus:ring-brand-blue/30 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-xs text-text-secondary">Remember me</span>
+</label>
+<a class="text-xs font-medium text-brand-blue-light hover:text-blue-400 hover:underline transition-all" href="#">
+                            Forgot Password?
+                        </a>
+</div>
+<!-- Primary Action Button -->
+<button class="w-full mt-2 py-3 px-4 rounded-xl bg-brand-blue hover:bg-brand-blue-hover text-white text-sm font-semibold tracking-wide flex items-center justify-center gap-2 transition-all duration-150 shadow-glow-blue hover:shadow-glow-blue-lg active:scale-[0.99]" type="submit">
+<span>Sign In to LMS Pro</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</form>
+<!-- Divider Line -->
+<div class="relative flex items-center my-6">
+<div class="flex-grow border-t border-white/10"></div>
+<span class="flex-shrink-0 mx-3 text-[11px] font-mono tracking-wider text-text-muted uppercase">or continue with</span>
+<div class="flex-grow border-t border-white/10"></div>
+</div>
+<!-- Social OAuth Buttons -->
+<div class="grid grid-cols-2 gap-3">
+<button class="w-full bg-[#161616] hover:bg-[#222222] border border-white/10 hover:border-white/20 text-white text-xs font-medium py-2.5 px-3 rounded-xl flex items-center justify-center gap-2.5 transition-all" type="button">
+<svg class="w-4 h-4 flex-shrink-0" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span>Google</span>
+</button>
+<button class="w-full bg-[#161616] hover:bg-[#222222] border border-white/10 hover:border-white/20 text-white text-xs font-medium py-2.5 px-3 rounded-xl flex items-center justify-center gap-2.5 transition-all" type="button">
+<svg class="w-4 h-4 text-white flex-shrink-0" fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.49 0-.24-.01-.88-.01-1.74-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.1 2.93.84.09-.65.35-1.1.64-1.35-2.22-.25-4.55-1.11-4.55-4.92 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02.8-.22 1.65-.33 2.5-.33.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85 0 1.34-.01 2.42-.01 2.75 0 .26.15.58.67.48C19.14 20.16 22 16.42 22 12c0-5.523-4.477-10-10-10z" fill-rule="evenodd"></path>
+</svg>
+<span>GitHub</span>
+</button>
+</div>
+</div>
+<!-- Footer Legal & Security Links -->
+<div class="mt-8 text-center text-xs text-text-muted space-x-3">
+<a class="hover:text-text-secondary transition-colors" href="#">Privacy Policy</a>
+<span>•</span>
+<a class="hover:text-text-secondary transition-colors" href="#">Terms of Service</a>
+<span>•</span>
+<a class="hover:text-text-secondary transition-colors" href="#">System Status</a>
+</div>
+</div>
+</div>
+</body></html>
