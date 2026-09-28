@@ -1,0 +1,519 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>LMS Pro - Advanced System Design</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Geist:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-container": "#00311f",
+                      "on-secondary-fixed-variant": "#004395",
+                      "on-secondary-container": "#e6ecff",
+                      "tertiary-fixed": "#6ffbbe",
+                      "tertiary": "#4edea3",
+                      "inverse-surface": "#e5e2e1",
+                      "surface-container-low": "#1c1b1b",
+                      "on-error": "#690005",
+                      "on-error-container": "#ffdad6",
+                      "inverse-primary": "#6d3bd7",
+                      "outline": "#958ea0",
+                      "background": "#131313",
+                      "outline-variant": "#494454",
+                      "surface-dim": "#131313",
+                      "on-primary": "#3c0091",
+                      "primary": "#d0bcff",
+                      "on-tertiary-fixed": "#002113",
+                      "on-primary-fixed": "#23005c",
+                      "surface-container-high": "#2a2a2a",
+                      "on-surface-variant": "#cbc3d7",
+                      "surface-tint": "#d0bcff",
+                      "surface-bright": "#393939",
+                      "primary-container": "#a078ff",
+                      "error": "#ffb4ab",
+                      "on-surface": "#e5e2e1",
+                      "surface-container": "#201f1f",
+                      "secondary-fixed": "#d8e2ff",
+                      "secondary": "#adc6ff",
+                      "error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-background": "#e5e2e1",
+                      "surface": "#131313",
+                      "on-primary-container": "#340080",
+                      "secondary-container": "#0566d9",
+                      "surface-variant": "#353534",
+                      "inverse-on-surface": "#313030",
+                      "surface-container-highest": "#353534",
+                      "on-tertiary": "#003824",
+                      "tertiary-container": "#00a572",
+                      "primary-fixed-dim": "#d0bcff",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "on-secondary": "#002e6a",
+                      "on-primary-fixed-variant": "#5516be",
+                      "primary-fixed": "#e9ddff",
+                      "on-secondary-fixed": "#001a42",
+                      "tertiary-fixed-dim": "#4edea3"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "gutter": "24px",
+                      "margin-desktop": "40px",
+                      "unit-md": "16px",
+                      "unit-lg": "24px",
+                      "container-max": "1440px",
+                      "unit-xl": "48px",
+                      "unit-sm": "8px",
+                      "unit-xs": "4px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-sm": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "34px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "40px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "30px",
+                              {
+                                      "lineHeight": "38px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-sm": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Base Canvas Styles */
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Tonal Layering / Glassmorphism */
+        .glass-panel {
+            background-color: theme('colors.surface-container-high');
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .glass-nav {
+            background-color: rgba(30, 30, 30, 0.6);
+            backdrop-filter: blur(12px);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: theme('colors.surface-container-lowest');
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.surface-variant');
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline');
+        }
+        
+        /* Interactive Input Glow */
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: theme('colors.primary');
+            box-shadow: 0 0 0 2px rgba(208, 188, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- ==========================================
+         SideNavBar (Predicted Shared Component)
+         ========================================== -->
+<nav class="hidden md:flex flex-col h-full py-unit-lg bg-surface dark:bg-surface border-r border-white/10 bg-surface-container-lowest fixed left-0 top-0 w-[280px] z-50">
+<!-- Brand / Header -->
+<div class="px-unit-lg mb-unit-xl flex items-center gap-unit-md cursor-pointer hover:opacity-80 transition-opacity">
+<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary-container flex items-center justify-center shadow-[0_4px_20px_rgba(208,188,255,0.3)]">
+<span class="material-symbols-outlined text-on-primary font-bold" data-icon="school">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary tracking-tight leading-none mb-1">LMS Pro</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">University Portal</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<ul class="flex flex-col gap-unit-xs px-unit-md flex-grow">
+<!-- Dashboard (Inactive) -->
+<li>
+<a class="flex items-center gap-unit-md px-unit-md py-unit-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-variant/50 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+</li>
+<!-- My Courses (Active - Intent match for course page) -->
+<li>
+<a class="flex items-center gap-unit-md px-unit-md py-unit-sm rounded-lg bg-surface-variant/30 text-primary font-bold border-r-2 border-primary transition-all duration-200 ease-in-out shadow-[inset_4px_0_0_0_theme('colors.primary')]" href="#">
+<span class="material-symbols-outlined" data-icon="school" data-weight="fill" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-md text-label-md">My Courses</span>
+</a>
+</li>
+<!-- Schedule (Inactive) -->
+<li>
+<a class="flex items-center gap-unit-md px-unit-md py-unit-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-variant/50 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</a>
+</li>
+</ul>
+<!-- Settings (Inactive - Bottom) -->
+<div class="px-unit-md mt-auto">
+<a class="flex items-center gap-unit-md px-unit-md py-unit-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-variant/50 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<!-- User Mini Profile -->
+<div class="mt-unit-lg px-unit-md pt-unit-md border-t border-white/5 flex items-center gap-unit-md cursor-pointer hover:bg-surface-variant/30 p-2 rounded-lg transition-colors">
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover border border-white/10" data-alt="A professional headshot of a young software engineer in a dimly lit, modern tech workspace. They are wearing a dark grey hoodie, looking focused. The lighting is cinematic with subtle purple and blue neon reflections, fitting a dark mode, high-end SaaS aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAz4zggc-WkfVvI3ikQyrmSUBdjiBQXgklFGTapJCUghgnRf-Xgf3FhL3iu4sSxx3EwgCd1y8EE--1gSXL0Z0BO-rcsll3AWJowdpbHyaSx1EESn5u-Bm9hC9WFUTUsrG0oGq9nN-A6FODGbpi8xKd7ANl946Kr5HwjbO5ZSZgccQ7BuRJAwPNgI-z9ZMEsBgcWh-yMGo7U85vOOERuPVhl4WMgzUW_9i6O6V3zR0u8z5FS5hv6i6bt8Q">
+<div class="overflow-hidden">
+<p class="font-label-md text-label-md text-on-surface truncate">Alex Chen</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate opacity-70">Senior Engineer</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- ==========================================
+         Main Layout Wrapper (Accounting for Sidebar)
+         ========================================== -->
+<div class="flex-grow flex flex-col w-full md:ml-[280px]">
+<!-- ==========================================
+             TopNavBar (Predicted Shared Component)
+             ========================================== -->
+<header class="flex justify-between items-center h-16 w-full px-margin-desktop bg-surface/60 backdrop-blur-xl border-b border-white/10 bg-surface-container shadow-sm docked full-width top-0 sticky z-40">
+<!-- Left: Breadcrumbs / Title Context -->
+<div class="flex items-center gap-unit-md">
+<!-- Mobile Menu Button (Hidden on Desktop) -->
+<button class="md:hidden text-on-surface-variant hover:text-on-surface transition-colors mr-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center font-label-sm text-label-sm text-on-surface-variant tracking-wide">
+<a class="hover:text-primary transition-colors" href="#">Courses</a>
+<span class="material-symbols-outlined text-[16px] mx-1 opacity-50" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary font-medium">Advanced System Design</span>
+</div>
+</div>
+<!-- Right: Actions & Navigation Links -->
+<div class="flex items-center gap-unit-lg">
+<!-- Top Nav Links (Intent-based, mirroring the prompt tabs if they act as top-level course nav) -->
+<nav class="hidden lg:flex gap-unit-lg mr-unit-lg h-full items-center">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md cursor-pointer active:scale-95 transition-all" href="#">Overview</a>
+<a class="text-on-surface-variant hover:text-on-surface font-body-md text-body-md cursor-pointer hover:opacity-80 transition-opacity active:scale-95" href="#">Q&amp;A</a>
+<a class="text-on-surface-variant hover:text-on-surface font-body-md text-body-md cursor-pointer hover:opacity-80 transition-opacity active:scale-95" href="#">Materials</a>
+<a class="text-on-surface-variant hover:text-on-surface font-body-md text-body-md cursor-pointer hover:opacity-80 transition-opacity active:scale-95" href="#">Notes</a>
+</nav>
+<!-- Search Action -->
+<button class="text-on-surface-variant hover:text-on-surface transition-colors active:scale-95">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<!-- Notifications -->
+<div class="relative cursor-pointer active:scale-95 hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full shadow-[0_0_8px_rgba(255,180,171,0.6)]"></span>
+</div>
+</div>
+</header>
+<!-- ==========================================
+             Main Stage / Canvas Content
+             ========================================== -->
+<main class="flex-grow p-gutter md:p-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-gutter max-w-container-max mx-auto w-full">
+<!-- Left Column: Video & Course Content (70% -> ~8 cols) -->
+<div class="lg:col-span-8 flex flex-col gap-unit-lg">
+<!-- Video Player Container (Bento/Glassmorphic Style) -->
+<div class="glass-panel rounded-xl overflow-hidden relative group shadow-[0_20px_40px_rgba(0,0,0,0.4)] aspect-video">
+<!-- Video Thumbnail Image -->
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A high-quality architectural diagram for a scalable distributed system, displayed on a glowing dark-mode presentation screen. The diagram shows databases, load balancers, and sharding logic connected by bright purple and blue neon lines. The aesthetic is clean, minimalist, and highly technical, fitting a professional software engineering course." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCOllAnLqSBNQ-Wu14JynSqZ2nFyjPU8OAtcKb_SjC9O4MPOHJtGwJ5QZCRu1XVS1xHYUIjS94E50HGoUIBofnMWAG-xqFNG_8cetcV7SvlbTPo-BkwX9zKi3upK_cnO0EzQ3tH0foJCC9AaMlCBRoIvWVzZEynjpVF_I1S6Uv29-i5UTL0FL4aii_OmT30U4UE7g1ps5XL1QbLyZFmcitgSXfMJTJWHcT0FSxl-AMjVIoVqMFWRAIEAA')"></div>
+<!-- Gradient Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
+<!-- Player Controls overlay -->
+<div class="absolute inset-0 flex flex-col justify-between p-unit-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
+<!-- Top Bar (Title & Tools) -->
+<div class="flex justify-between items-start">
+<div class="bg-surface-container-high/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+<span class="font-label-sm text-label-sm text-on-surface font-medium">Module 4: Scalable Architectures</span>
+</div>
+<button class="bg-surface-container-high/80 backdrop-blur-md p-2 rounded-lg border border-white/10 text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">picture_in_picture_alt</span>
+</button>
+</div>
+<!-- Center Play Button (Large) -->
+<div class="flex justify-center items-center flex-grow cursor-pointer group/play">
+<div class="w-16 h-16 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center backdrop-blur-md group-hover/play:bg-primary/40 group-hover/play:scale-110 transition-all duration-300 shadow-[0_0_30px_rgba(208,188,255,0.3)]">
+<span class="material-symbols-outlined text-primary text-4xl ml-1" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<!-- Bottom Controls -->
+<div class="bg-surface-container/90 backdrop-blur-xl p-unit-md rounded-xl border border-white/10 flex flex-col gap-unit-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+<!-- Progress Bar -->
+<div class="w-full h-1.5 bg-surface-variant rounded-full overflow-hidden cursor-pointer relative">
+<div class="h-full bg-gradient-to-r from-primary-container to-primary w-[45%] relative shadow-[0_0_10px_rgba(208,188,255,0.8)]">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-[0_0_8px_theme('colors.primary')]"></div>
+</div>
+</div>
+<!-- Control Buttons -->
+<div class="flex justify-between items-center mt-1">
+<div class="flex items-center gap-unit-md text-on-surface-variant">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">pause</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">volume_up</span></button>
+<span class="font-label-sm text-label-sm font-mono text-on-surface ml-2">12:45 / 45:30</span>
+</div>
+<div class="flex items-center gap-unit-md text-on-surface-variant">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">closed_caption</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">settings</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">fullscreen</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Course Content Area -->
+<div class="flex flex-col gap-unit-lg">
+<!-- Title & Meta -->
+<div>
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface mb-2">Building Scalable Architectures</h2>
+<div class="flex items-center gap-unit-md font-label-sm text-label-sm text-on-surface-variant">
+<span class="bg-surface-variant px-2 py-1 rounded text-on-surface">Module 4</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 45 mins</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 1.2k viewed</span>
+</div>
+</div>
+<!-- Internal Tabs (If TopNav didn't suffice or for local module context) -->
+<div class="border-b border-white/10 flex gap-unit-lg font-label-md text-label-md">
+<button class="text-primary font-bold border-b-2 border-primary pb-2 px-1 relative">
+                            Overview
+                            <div class="absolute -bottom-[1px] left-0 w-full h-[2px] bg-primary shadow-[0_-2px_8px_rgba(208,188,255,0.6)] rounded-t-full"></div>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface pb-2 px-1 transition-colors">Resources</button>
+<button class="text-on-surface-variant hover:text-on-surface pb-2 px-1 transition-colors">Transcript</button>
+</div>
+<!-- Overview Content (Active Tab) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-unit-lg">
+<!-- Description Column -->
+<div class="md:col-span-2 flex flex-col gap-unit-md font-body-md text-body-md text-on-surface-variant leading-relaxed">
+<p>
+                                In this session, we dive deep into the core principles of horizontal vs vertical scaling. We'll explore practical strategies for database sharding, caching layers (Redis/Memcached), and load balancing techniques to handle millions of concurrent requests.
+                            </p>
+<div class="bg-surface-container p-unit-md rounded-lg border border-white/5 border-t-[0.5px] border-t-white/10">
+<h4 class="font-label-md text-label-md text-on-surface mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">psychology</span> Key Concepts
+                                </h4>
+<ul class="list-disc list-inside space-y-1 ml-1 text-sm">
+<li>CAP Theorem &amp; Eventual Consistency</li>
+<li>Consistent Hashing Strategies</li>
+<li>Microservices inter-service communication (gRPC vs REST)</li>
+</ul>
+</div>
+</div>
+<!-- Progress / Status Column -->
+<div class="glass-panel p-unit-md rounded-lg flex flex-col justify-between">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-4">Module Progress</h4>
+<div class="relative w-24 h-24 mx-auto mb-4">
+<!-- Fake SVG Circular Progress -->
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="theme('colors.surface-variant')" stroke-width="8"></circle>
+<circle class="shadow-[0_0_10px_theme('colors.primary')]" cx="50" cy="50" fill="transparent" r="40" stroke="theme('colors.primary')" stroke-dasharray="251.2" stroke-dashoffset="113.04" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center flex-col">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface leading-none">55%</span>
+</div>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-variant hover:bg-surface-bright text-on-surface font-label-md text-label-md rounded border border-white/10 transition-colors">
+                                Mark as Complete
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Live Chat / Q&A (30% -> ~4 cols) -->
+<div class="lg:col-span-4 h-[800px] lg:h-auto">
+<!-- Sticky Container -->
+<div class="sticky top-24 h-[calc(100vh-120px)] glass-panel rounded-xl border-t-[0.5px] border-t-white/10 flex flex-col overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
+<!-- Chat Header -->
+<div class="px-unit-md py-unit-md border-b border-white/10 bg-surface-container-high/50 flex justify-between items-center shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">forum</span>
+<h3 class="font-label-md text-label-md text-on-surface font-semibold">Live Discussion</h3>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full border border-tertiary/20">
+<span class="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_5px_theme('colors.tertiary')] animate-pulse"></span>
+                            42 Online
+                        </div>
+</div>
+<!-- Chat Messages Area -->
+<div class="flex-grow p-unit-md overflow-y-auto flex flex-col gap-unit-md scroll-smooth relative">
+<!-- System Message -->
+<div class="text-center my-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-variant/30 px-3 py-1 rounded-full text-xs">Instructor joined the chat</span>
+</div>
+<!-- Message: Sarah -->
+<div class="flex gap-3">
+<img alt="Sarah Avatar" class="w-8 h-8 rounded-full border border-white/10 shrink-0" data-alt="A small, circular avatar portrait of a young female student with dark curly hair and glasses, set against a dark purple gradient background. Lighting is soft and professional, fitting a modern tech platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOhv4iMDbwYbaEDFwHmPWHukbUavV_xDiU_4VkBBPZ5m1XfSyCUFMRS30sw7XTJryMpHBxAjC6u4vugN3Y2sWMxNPWsLVGyy5u_KeX-1mNHz9iHUi-jEXfSQxuIeAJjn8FmTP6YivH4_-oDn9CCxa7NH_NDIFhARzwaxZhHdoFws76Y-psVXgqabIacu1fZa123faVl3BxERbySC6F8__X-ZIWt7idr4XaRKykvWf6eOwTQb7bNxLM5g">
+<div class="flex flex-col gap-1 w-full">
+<div class="flex items-baseline justify-between">
+<span class="font-label-sm text-label-sm text-secondary font-medium">Sarah Jenkins</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant opacity-70">12:41 PM</span>
+</div>
+<div class="bg-surface-variant/40 p-3 rounded-r-lg rounded-bl-lg border border-white/5 font-body-sm text-body-sm text-on-surface">
+                                    How does this handle state when a node goes down during a rebalance?
+                                </div>
+</div>
+</div>
+<!-- Message: Alex -->
+<div class="flex gap-3">
+<img alt="Alex Avatar" class="w-8 h-8 rounded-full border border-white/10 shrink-0" data-alt="A small, circular avatar portrait of a male software developer with a short beard and a neutral expression, set against a dark slate background. Professional and clean aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd0jRlhVu_G2hjnFhzYygdXVIByj9xFMBQwX8_NCzaxV5nFrEs71DzGqIRosbHl_udiaq0vRqH7FqtoPZOmaLsMcXdeTRd6y4SXr1SRRv_WmwZ7jrzBtF5TIhC0wW2qZwwWnt1QscaTR4hXj0L53LtNTxlTwHIx3VDVMGk2Toc6OI_mPG6jWiXlbz-az9BNSIBlxgPgQyqgBIqTxV3NNfMliwXc2-7GYi7-aKGiTGTkAGb4Nk9AQEo7A">
+<div class="flex flex-col gap-1 w-full">
+<div class="flex items-baseline justify-between">
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim font-medium">Alex Rivera</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant opacity-70">12:43 PM</span>
+</div>
+<div class="bg-surface-variant/40 p-3 rounded-r-lg rounded-bl-lg border border-white/5 font-body-sm text-body-sm text-on-surface">
+                                    Great explanation on sharding! 🤯 The consistent hashing part finally clicked for me.
+                                </div>
+</div>
+</div>
+<!-- Message: Instructor (Highlighted) -->
+<div class="flex gap-3 mt-2">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-container flex items-center justify-center shrink-0 border border-white/20 shadow-[0_0_10px_rgba(208,188,255,0.4)]">
+<span class="material-symbols-outlined text-on-primary text-sm font-bold">school</span>
+</div>
+<div class="flex flex-col gap-1 w-full">
+<div class="flex items-baseline justify-between">
+<span class="font-label-sm text-label-sm text-primary font-bold">Dr. V. (Instructor)</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant opacity-70">12:45 PM</span>
+</div>
+<div class="bg-primary/10 p-3 rounded-r-lg rounded-bl-lg border border-primary/30 font-body-sm text-body-sm text-on-surface shadow-[inset_2px_0_0_0_theme('colors.primary')]">
+                                    @Sarah - Great question. We usually rely on a combination of a write-ahead log (WAL) and consensus protocols like Raft to ensure the state isn't lost. We'll cover that in Module 5!
+                                </div>
+</div>
+</div>
+<!-- Spacer for scrolling -->
+<div class="h-2"></div>
+</div>
+<!-- Chat Input Area -->
+<div class="p-unit-md border-t border-white/10 bg-surface-container shrink-0">
+<div class="relative flex items-end bg-[#1E1E1E] rounded-lg border border-white/10 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-200">
+<textarea class="w-full bg-transparent border-none text-on-surface font-body-sm text-body-sm placeholder-on-surface-variant/50 resize-none py-3 pl-3 pr-12 focus:ring-0 max-h-[100px]" placeholder="Ask a question or share thoughts..." rows="1"></textarea>
+<button class="absolute right-2 bottom-2 w-8 h-8 rounded bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-sm font-bold" style="transform: rotate(-45deg) translateX(1px) translateY(-1px);">send</span>
+</button>
+</div>
+<div class="mt-2 flex justify-between items-center text-[10px] text-on-surface-variant font-label-sm">
+<span>Markdown supported</span>
+<span class="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors"><span class="material-symbols-outlined text-[12px]">code</span> Insert Snippet</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
