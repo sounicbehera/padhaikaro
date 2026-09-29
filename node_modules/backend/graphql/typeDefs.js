@@ -76,7 +76,7 @@ const typeDefs = `#graphql
   }
 
   type AuthPayload {
-    token: String!
+    token: String
     user: User!
   }
 
@@ -91,6 +91,9 @@ const typeDefs = `#graphql
   type Mutation {
     register(name: String!, email: String!, password: String!, role: String): AuthPayload
     login(email: String!, password: String!): AuthPayload
+    verifyOTP(email: String!, otp: String!): AuthPayload
+    forgotPassword(email: String!): Boolean
+    resetPassword(email: String!, otp: String!, newPassword: String!): Boolean
     
     createCourse(title: String!, slug: String!, description: String, price: Float, category: String, level: String): Course
     publishCourse(courseId: ID!): Course

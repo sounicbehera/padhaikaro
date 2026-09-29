@@ -23,7 +23,10 @@ const userSchema = new mongoose.Schema({
     issueDate: String,
     type: { type: String }
   }],
-  enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]
+  enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
+  isVerified: { type: Boolean, default: false },
+  otp: { type: String },
+  otpExpiry: { type: Date }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

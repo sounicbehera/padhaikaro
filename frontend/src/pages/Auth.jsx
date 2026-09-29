@@ -21,31 +21,81 @@ const REGISTER_MUTATION = gql`
   }
 `;
 
+const VERIFY_OTP_MUTATION = gql`
+  mutation VerifyOTP($email: String!, $otp: String!) {
+    verifyOTP(email: $email, otp: $otp) {
+      token
+      user { id name role }
+    }
+  }
+`;
+
+const FORGOT_PASSWORD_MUTATION = gql`
+  mutation ForgotPassword($email: String!) {
+    forgotPassword(email: $email)
+  }
+`;
+
+const RESET_PASSWORD_MUTATION = gql`
+  mutation ResetPassword($email: String!, $otp: String!, $newPassword: String!) {
+    resetPassword(email: $email, otp: $otp, newPassword: $newPassword)
+  }
+`;
+
 const Auth = () => {
-    const [isLogin, setIsLogin] = useState(true);
-    const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'Student' });
+    const [view, setView] = useState('login'); // 'login', 'register', 'verify', 'forgot', 'reset'
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', otp: '' });
     const navigate = useNavigate();
 
     const [login, { loading: loginLoading, error: loginError }] = useMutation(LOGIN_MUTATION, {
         onCompleted: (data) => {
             localStorage.setItem('token', data.login.token);
             navigate('/catalog');
+        },
+        onError: (err) => {
+            if (err.message.includes('verify your email')) {
+                setView('verify');
+            }
         }
     });
 
     const [register, { loading: regLoading, error: regError }] = useMutation(REGISTER_MUTATION, {
         onCompleted: (data) => {
-            localStorage.setItem('token', data.register.token);
+            setView('verify');
+        }
+    });
+
+    const [verifyOTP, { loading: verifyLoading, error: verifyError }] = useMutation(VERIFY_OTP_MUTATION, {
+        onCompleted: (data) => {
+            localStorage.setItem('token', data.verifyOTP.token);
             navigate('/catalog');
+        }
+    });
+
+    const [forgotPassword, { loading: forgotLoading, error: forgotError }] = useMutation(FORGOT_PASSWORD_MUTATION, {
+        onCompleted: () => {
+            setView('reset');
+        }
+    });
+
+    const [resetPassword, { loading: resetLoading, error: resetError }] = useMutation(RESET_PASSWORD_MUTATION, {
+        onCompleted: () => {
+            setView('login');
         }
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (isLogin) {
+        if (view === 'login') {
             login({ variables: { email: formData.email, password: formData.password } });
-        } else {
+        } else if (view === 'register') {
             register({ variables: formData });
+        } else if (view === 'verify') {
+            verifyOTP({ variables: { email: formData.email, otp: formData.otp } });
+        } else if (view === 'forgot') {
+            forgotPassword({ variables: { email: formData.email } });
+        } else if (view === 'reset') {
+            resetPassword({ variables: { email: formData.email, otp: formData.otp, newPassword: formData.password } });
         }
     };
 
@@ -95,25 +145,48 @@ const Auth = () => {
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex border-b border-surface-variant mb-unit-lg">
-                        <button
-                            onClick={() => setIsLogin(true)}
-                            className={`w-1/2 flex justify-center items-center py-unit-sm font-label-md text-label-md text-center border-b-2 transition-colors ${isLogin ? 'font-bold text-primary border-primary' : 'text-on-surface-variant hover:text-on-surface border-transparent'}`}
-                        >
-                            Sign In
-                        </button>
-                        <button
-                            onClick={() => setIsLogin(false)}
-                            className={`w-1/2 flex justify-center items-center py-unit-sm font-label-md text-label-md text-center border-b-2 transition-colors ${!isLogin ? 'font-bold text-primary border-primary' : 'text-on-surface-variant hover:text-on-surface border-transparent'}`}
-                        >
-                            Create Account
-                        </button>
-                    </div>
+                    {(view === 'login' || view === 'register') && (
+                        <div className="flex border-b border-surface-variant mb-unit-lg">
+                            <button
+                                onClick={() => setView('login')}
+                                className={`w-1/2 flex justify-center items-center py-unit-sm font-label-md text-label-md text-center border-b-2 transition-colors ${view === 'login' ? 'font-bold text-primary border-primary' : 'text-on-surface-variant hover:text-on-surface border-transparent'}`}
+                            >
+                                Sign In
+                            </button>
+                            <button
+                                onClick={() => setView('register')}
+                                className={`w-1/2 flex justify-center items-center py-unit-sm font-label-md text-label-md text-center border-b-2 transition-colors ${view === 'register' ? 'font-bold text-primary border-primary' : 'text-on-surface-variant hover:text-on-surface border-transparent'}`}
+                            >
+                                Create Account
+                            </button>
+                        </div>
+                    )}
+                    
+                    {view === 'verify' && (
+                        <div className="text-center mb-unit-lg">
+                            <h2 className="font-headline-sm text-primary mb-2">Verify Your Email</h2>
+                            <p className="text-on-surface-variant">We've sent an OTP to {formData.email}</p>
+                        </div>
+                    )}
+
+                    {view === 'forgot' && (
+                        <div className="text-center mb-unit-lg">
+                            <h2 className="font-headline-sm text-primary mb-2">Reset Password</h2>
+                            <p className="text-on-surface-variant">Enter your email to receive an OTP.</p>
+                        </div>
+                    )}
+
+                    {view === 'reset' && (
+                        <div className="text-center mb-unit-lg">
+                            <h2 className="font-headline-sm text-primary mb-2">Set New Password</h2>
+                            <p className="text-on-surface-variant">Enter the OTP sent to your email and your new password.</p>
+                        </div>
+                    )}
 
                     {/* Form */}
                     <form className="space-y-unit-md" onSubmit={handleSubmit}>
                         <div className="space-y-unit-lg">
-                            {!isLogin && (
+                            {view === 'register' && (
                                 <div className="relative">
                                     <input
                                         id="name"
@@ -128,88 +201,85 @@ const Auth = () => {
                                 </div>
                             )}
 
-                            <div className="relative">
-                                <input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    placeholder="Email"
-                                    className="peer w-full bg-[#1E1E1E] text-on-surface font-body-md text-body-md px-4 pt-6 pb-2 rounded border border-outline-variant placeholder-transparent input-glow focus:outline-none transition-all"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                />
-                                <label htmlFor="email" className="absolute left-4 top-2 font-label-sm text-label-sm text-on-surface-variant transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:font-body-md peer-placeholder-shown:text-body-md peer-focus:top-2 peer-focus:font-label-sm peer-focus:text-label-sm peer-focus:text-primary pointer-events-none">Email Address</label>
-                            </div>
-
-                            <div className="relative">
-                                <input
-                                    id="password"
-                                    type="password"
-                                    required
-                                    placeholder="Password"
-                                    className="peer w-full bg-[#1E1E1E] text-on-surface font-body-md text-body-md px-4 pt-6 pb-2 rounded border border-outline-variant placeholder-transparent input-glow focus:outline-none transition-all"
-                                    value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                />
-                                <label htmlFor="password" className="absolute left-4 top-2 font-label-sm text-label-sm text-on-surface-variant transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:font-body-md peer-placeholder-shown:text-body-md peer-focus:top-2 peer-focus:font-label-sm peer-focus:text-label-sm peer-focus:text-primary pointer-events-none">Password</label>
-                            </div>
-
-                            {!isLogin && (
+                            {(view === 'login' || view === 'register' || view === 'forgot' || view === 'verify' || view === 'reset') && (
                                 <div className="relative">
-                                    <select
-                                        className="peer w-full bg-[#1E1E1E] text-on-surface font-body-md text-body-md px-4 pt-6 pb-2 rounded border border-outline-variant input-glow focus:outline-none transition-all appearance-none"
-                                        value={formData.role}
-                                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                    >
-                                        <option value="Student">Student</option>
-                                        <option value="Instructor">Instructor</option>
-                                    </select>
-                                    <label className="absolute left-4 top-2 font-label-sm text-label-sm text-primary pointer-events-none">Role</label>
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        required
+                                        placeholder="Email"
+                                        className="peer w-full bg-[#1E1E1E] text-on-surface font-body-md text-body-md px-4 pt-6 pb-2 rounded border border-outline-variant placeholder-transparent input-glow focus:outline-none transition-all"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        disabled={view === 'verify' || view === 'reset'}
+                                    />
+                                    <label htmlFor="email" className="absolute left-4 top-2 font-label-sm text-label-sm text-on-surface-variant transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:font-body-md peer-placeholder-shown:text-body-md peer-focus:top-2 peer-focus:font-label-sm peer-focus:text-label-sm peer-focus:text-primary pointer-events-none">Email Address</label>
+                                </div>
+                            )}
+
+                            {(view === 'verify' || view === 'reset') && (
+                                <div className="relative">
+                                    <input
+                                        id="otp"
+                                        type="text"
+                                        required
+                                        placeholder="OTP"
+                                        className="peer w-full bg-[#1E1E1E] text-on-surface font-body-md text-body-md px-4 pt-6 pb-2 rounded border border-outline-variant placeholder-transparent input-glow focus:outline-none transition-all"
+                                        value={formData.otp}
+                                        onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
+                                    />
+                                    <label htmlFor="otp" className="absolute left-4 top-2 font-label-sm text-label-sm text-on-surface-variant transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:font-body-md peer-placeholder-shown:text-body-md peer-focus:top-2 peer-focus:font-label-sm peer-focus:text-label-sm peer-focus:text-primary pointer-events-none">6-Digit OTP</label>
+                                </div>
+                            )}
+
+                            {(view === 'login' || view === 'register' || view === 'reset') && (
+                                <div className="relative">
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        required
+                                        placeholder="Password"
+                                        className="peer w-full bg-[#1E1E1E] text-on-surface font-body-md text-body-md px-4 pt-6 pb-2 rounded border border-outline-variant placeholder-transparent input-glow focus:outline-none transition-all"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    />
+                                    <label htmlFor="password" className="absolute left-4 top-2 font-label-sm text-label-sm text-on-surface-variant transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:font-body-md peer-placeholder-shown:text-body-md peer-focus:top-2 peer-focus:font-label-sm peer-focus:text-label-sm peer-focus:text-primary pointer-events-none">{view === 'reset' ? 'New Password' : 'Password'}</label>
                                 </div>
                             )}
                         </div>
 
                         {loginError && <p className="text-error font-body-sm text-body-sm mt-2">{loginError.message}</p>}
                         {regError && <p className="text-error font-body-sm text-body-sm mt-2">{regError.message}</p>}
+                        {verifyError && <p className="text-error font-body-sm text-body-sm mt-2">{verifyError.message}</p>}
+                        {forgotError && <p className="text-error font-body-sm text-body-sm mt-2">{forgotError.message}</p>}
+                        {resetError && <p className="text-error font-body-sm text-body-sm mt-2">{resetError.message}</p>}
 
-                        <div className="flex justify-end pt-unit-xs">
-                            <a className="font-label-sm text-label-sm text-primary hover:text-primary-fixed transition-colors" href="#">Forgot Password?</a>
-                        </div>
+                        {view === 'login' && (
+                            <div className="flex justify-end pt-unit-xs">
+                                <a className="font-label-sm text-label-sm text-primary hover:text-primary-fixed transition-colors cursor-pointer" onClick={(e) => { e.preventDefault(); setView('forgot'); }}>Forgot Password?</a>
+                            </div>
+                        )}
+                        {(view === 'verify' || view === 'forgot' || view === 'reset') && (
+                            <div className="flex justify-end pt-unit-xs">
+                                <a className="font-label-sm text-label-sm text-primary hover:text-primary-fixed transition-colors cursor-pointer" onClick={(e) => { e.preventDefault(); setView('login'); }}>Back to Login</a>
+                            </div>
+                        )}
 
                         <button
                             type="submit"
-                            disabled={loginLoading || regLoading}
+                            disabled={loginLoading || regLoading || verifyLoading || forgotLoading || resetLoading}
                             className="w-full bg-gradient-to-r from-primary to-primary-container text-background font-label-md text-label-md py-3 rounded flex items-center justify-center gap-2 hover:opacity-90 transition-opacity mt-unit-md shadow-sm disabled:opacity-50"
                         >
-                            {isLogin ? 'Log In' : 'Sign Up'}
+                            {view === 'login' ? 'Log In' : 
+                             view === 'register' ? 'Sign Up' : 
+                             view === 'verify' ? 'Verify OTP' : 
+                             view === 'forgot' ? 'Send OTP' : 
+                             'Reset Password'}
                             <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                         </button>
                     </form>
 
-                    <div className="relative flex items-center py-unit-lg">
-                        <div className="flex-grow border-t border-surface-variant"></div>
-                        <span className="flex-shrink-0 mx-4 font-label-sm text-label-sm text-on-surface-variant">OR</span>
-                        <div className="flex-grow border-t border-surface-variant"></div>
-                    </div>
 
-                    {/* Social Auth */}
-                    <div className="space-y-unit-sm">
-                        <button className="w-full bg-transparent border border-white/10 text-on-surface font-label-md text-label-md py-3 rounded flex items-center justify-center gap-3 hover:bg-surface-variant/50 transition-colors">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-                            </svg>
-                            Sign in with Google
-                        </button>
-                        <button className="w-full bg-transparent border border-white/10 text-on-surface font-label-md text-label-md py-3 rounded flex items-center justify-center gap-3 hover:bg-surface-variant/50 transition-colors">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.49 0-.24-.01-.88-.01-1.74-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.1 2.93.84.09-.65.35-1.1.64-1.35-2.22-.25-4.55-1.11-4.55-4.92 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02.8-.22 1.65-.33 2.5-.33.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85 0 1.34-.01 2.42-.01 2.75 0 .26.15.58.67.48C19.14 20.16 22 16.42 22 12c0-5.523-4.477-10-10-10z" fill="currentColor" fillRule="evenodd"></path>
-                            </svg>
-                            Sign in with GitHub
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

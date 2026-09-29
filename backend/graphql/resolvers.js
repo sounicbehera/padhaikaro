@@ -7,6 +7,37 @@ const Lesson = require('../models/Lesson');
 const Enrollment = require('../models/Enrollment');
 const { checkAuth, checkRole, JWT_SECRET } = require('../middleware/auth');
 
+const sendEmailViaBrevo = async (to, subject, htmlContent) => {
+  if (!process.env.BREVO_API_KEY || process.env.BREVO_API_KEY === 'your_brevo_api_key_here') {
+    console.log(`[Brevo Mock] To: ${to} | Subject: ${subject}`);
+    return;
+  }
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'LMS Pro', email: process.env.BREVO_SENDER_EMAIL || 'noreply@lmspro.com' },
+        to: [{ email: to }],
+        subject,
+        htmlContent
+      })
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Failed to send email via Brevo:', errorText);
+    } else {
+      console.log(`Email successfully sent to ${to}`);
+    }
+  } catch (error) {
+    console.error('Error sending email via Brevo:', error);
+  }
+};
+
 const resolvers = {
   Query: {
     me: async (_, __, { user }) => {
@@ -46,26 +77,102 @@ const resolvers = {
   Mutation: {
     register: async (_, { name, email, password, role }) => {
       const existingUser = await User.findOne({ email });
-      if (existingUser) throw new Error('Email already in use');
+      if (existingUser) {
+        if (existingUser.isVerified) {
+          throw new Error('Email already in use');
+        } else {
+          await User.deleteOne({ email });
+        }
+      }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const userRole = role || 'Student'; // Default to student
       
-      const user = new User({ name, email, password: hashedPassword, role: userRole });
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpiry = new Date(Date.now() + 60 * 1000); // 1 minute
+      
+      const user = new User({ 
+        name, email, password: hashedPassword, role: userRole, 
+        isVerified: false, otp, otpExpiry 
+      });
       await user.save();
 
-      const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
-      return { token, user };
+      console.log(`[OTP] Registration OTP for ${email}: ${otp}`);
+      await sendEmailViaBrevo(
+        email, 
+        'Verify your LMS Pro Account', 
+        `<html><body><h2>Welcome to LMS Pro!</h2><p>Your OTP code to verify your account is: <strong>${otp}</strong></p><p>This code will expire in 1 minute.</p></body></html>`
+      );
+
+      setTimeout(async () => {
+        try {
+          const checkUser = await User.findById(user._id);
+          if (checkUser && !checkUser.isVerified) {
+            await User.deleteOne({ _id: user._id });
+            console.log(`[System] Deleted unverified user ${email} after 1 minute.`);
+          }
+        } catch (e) {
+          console.error('Error during automatic user deletion:', e);
+        }
+      }, 60 * 1000);
+
+      return { token: null, user };
     },
     login: async (_, { email, password }) => {
       const user = await User.findOne({ email });
       if (!user) throw new Error('Invalid credentials');
+
+      if (!user.isVerified) throw new Error('Please verify your email first');
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) throw new Error('Invalid credentials');
 
       const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
       return { token, user };
+    },
+    verifyOTP: async (_, { email, otp }) => {
+      const user = await User.findOne({ email });
+      if (!user) throw new Error('User not found');
+      if (user.otp !== otp) throw new Error('Invalid OTP');
+      if (user.otpExpiry < new Date()) throw new Error('OTP expired');
+      
+      user.isVerified = true;
+      user.otp = undefined;
+      user.otpExpiry = undefined;
+      await user.save();
+      
+      const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+      return { token, user };
+    },
+    forgotPassword: async (_, { email }) => {
+      const user = await User.findOne({ email });
+      if (!user) return true; // Pretend it worked
+      
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      user.otp = otp;
+      user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+      await user.save();
+      
+      console.log(`[OTP] Password Reset OTP for ${email}: ${otp}`);
+      await sendEmailViaBrevo(
+        email, 
+        'Reset your LMS Pro Password', 
+        `<html><body><h2>Password Reset</h2><p>Your OTP code to reset your password is: <strong>${otp}</strong></p><p>This code will expire in 10 minutes. If you did not request a password reset, please ignore this email.</p></body></html>`
+      );
+      return true;
+    },
+    resetPassword: async (_, { email, otp, newPassword }) => {
+      const user = await User.findOne({ email });
+      if (!user) throw new Error('User not found');
+      if (user.otp !== otp) throw new Error('Invalid OTP');
+      if (user.otpExpiry < new Date()) throw new Error('OTP expired');
+      
+      user.password = await bcrypt.hash(newPassword, 10);
+      user.otp = undefined;
+      user.otpExpiry = undefined;
+      await user.save();
+      
+      return true;
     },
     createCourse: async (_, args, { user }) => {
       checkRole(user, ['Instructor', 'Admin']);
@@ -188,7 +295,8 @@ const resolvers = {
         if (mediaType === 'video') {
            options.resource_type = 'video';
         } else if (mediaType === 'pdf') {
-           options.resource_type = 'raw';
+           options.resource_type = 'image';
+           options.format = 'pdf';
         }
         
         const result = await cloudinary.uploader.upload(base64Data, options);

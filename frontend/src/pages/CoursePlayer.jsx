@@ -5,6 +5,18 @@ import { useQuery } from '@apollo/client/react';
 import ChatWidget from '../components/ChatWidget';
 import { Play, PlayCircle, FileText, CheckCircle, Search, Bell, Settings, Calendar, LayoutDashboard, Menu, GraduationCap, MessageSquare } from 'lucide-react';
 
+const getProcessedPdfUrl = (url) => {
+  if (!url) return '';
+  let processedUrl = url;
+  if (processedUrl.includes('/raw/upload/')) {
+    processedUrl = processedUrl.replace('/raw/upload/', '/image/upload/');
+  }
+  if (!processedUrl.toLowerCase().endsWith('.pdf')) {
+    processedUrl += '.pdf';
+  }
+  return processedUrl;
+};
+
 const GET_COURSE = gql`
   query GetCourse($slug: String!) {
     getCourse(slug: $slug) {
@@ -142,13 +154,23 @@ const CoursePlayer = () => {
           <div className="lg:col-span-8 flex flex-col gap-unit-lg">
             
             {/* Player Container */}
-            {activeLessonView === 'pdf' && activeLesson?.pdfUrl ? (
-              <div className="w-full h-[500px] md:h-[700px] rounded-xl overflow-hidden border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)] bg-surface-container">
-                <iframe 
-                  src={activeLesson.pdfUrl} 
-                  title="Course PDF Material"
-                  className="w-full h-full border-none bg-white"
-                ></iframe>
+            {activeLessonView === 'pdf' ? (
+              <div className="w-full h-[500px] md:h-[700px] rounded-xl overflow-hidden border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)] bg-surface-container relative flex items-center justify-center">
+                {!activeLesson?.pdfUrl ? (
+                  <div className="text-on-surface-variant font-medium">No PDF material available for this lesson.</div>
+                ) : (
+                  <>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-on-surface-variant text-sm animate-pulse">Loading PDF Document...</span>
+                    </div>
+                    <iframe 
+                      src={getProcessedPdfUrl(activeLesson.pdfUrl)} 
+                      title="Course PDF Material"
+                      className="w-full h-full border-none bg-white relative z-10"
+                    ></iframe>
+                  </>
+                )}
               </div>
             ) : (
               <div className="glass-panel rounded-xl overflow-hidden relative group shadow-[0_20px_40px_rgba(0,0,0,0.4)] aspect-video bg-black flex items-center justify-center">
@@ -224,7 +246,7 @@ const CoursePlayer = () => {
                   Online
                 </div>
               </div>
-              <div className="flex-grow flex flex-col relative bg-surface-container/30">
+              <div className="flex-grow flex flex-col relative bg-surface-container/30 min-h-0">
                 <ChatWidget courseId={course.id} userName={userName} />
               </div>
             </div>
