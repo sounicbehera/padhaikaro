@@ -11,7 +11,7 @@ const GET_COURSE = gql`
       id title description instructor { name }
       modules {
         id title order
-        lessons { id title duration videoUrl content }
+        lessons { id title duration videoUrl pdfUrl content }
       }
     }
     me { name }
@@ -22,6 +22,7 @@ const CoursePlayer = () => {
   const { slug } = useParams();
   const { loading, error, data } = useQuery(GET_COURSE, { variables: { slug } });
   const [activeLesson, setActiveLesson] = useState(null);
+  const [activeLessonView, setActiveLessonView] = useState('video');
   const [activeTab, setActiveTab] = useState('Overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -51,33 +52,53 @@ const CoursePlayer = () => {
           </div>
         </div>
 
-        <ul className="flex flex-col gap-unit-xs px-unit-md flex-grow">
-          <li>
-            <Link to="/" className="flex items-center gap-unit-md px-unit-md py-unit-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-variant/50 transition-colors duration-200 ease-in-out">
-              <LayoutDashboard className="w-5 h-5" />
-              <span className="font-label-md text-label-md">Dashboard</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/catalog" className="flex items-center gap-unit-md px-unit-md py-unit-sm rounded-lg bg-surface-variant/30 text-primary font-bold border-r-2 border-primary transition-all duration-200 ease-in-out shadow-[inset_4px_0_0_0_var(--color-primary)]">
-              <GraduationCap className="w-5 h-5 fill-current" />
-              <span className="font-label-md text-label-md">My Courses</span>
-            </Link>
-          </li>
-          <li>
-            <a href="#" className="flex items-center gap-unit-md px-unit-md py-unit-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-variant/50 transition-colors duration-200 ease-in-out">
-              <Calendar className="w-5 h-5" />
-              <span className="font-label-md text-label-md">Schedule</span>
-            </a>
-          </li>
-        </ul>
+        <div className="flex flex-col flex-grow overflow-y-auto px-unit-md pb-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-surface-variant [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-surface-variant/80">
+          <div className="mb-4 mt-2">
+            <h2 className="font-label-lg text-label-lg font-bold text-on-surface px-2">Course Content</h2>
+            <p className="text-xs text-on-surface-variant px-2 mt-1">{course.modules?.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) || 0} lessons</p>
+          </div>
+          <div className="space-y-4">
+            {course.modules?.map(module => (
+              <div key={module.id} className="flex flex-col gap-1">
+                <h4 className="font-bold text-on-surface mb-1 flex items-center gap-2 text-sm px-2">
+                  <span className="bg-surface-variant text-on-surface px-1.5 py-0.5 rounded text-[10px]">Module {module.order}</span>
+                  <span className="truncate">{module.title}</span>
+                </h4>
+                <div className="space-y-0.5">
+                  {module.lessons?.map(lesson => (
+                    <div key={lesson.id} className="flex flex-col">
+                      <button
+                        onClick={() => { setActiveLesson(lesson); setActiveLessonView('video'); }}
+                        className={`w-full text-left flex items-center gap-2 p-2 rounded-md transition text-sm ${activeLesson?.id === lesson.id && activeLessonView === 'video' ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'}`}
+                      >
+                        {lesson.videoUrl ? <PlayCircle className="w-4 h-4 shrink-0" /> : <PlayCircle className="w-4 h-4 shrink-0 opacity-50" />}
+                        <span className="flex-1 truncate leading-tight">{lesson.title}</span>
+                        {lesson.duration && <span className="text-[10px] opacity-70 shrink-0">{lesson.duration}m</span>}
+                      </button>
+                      
+                      {lesson.pdfUrl && (
+                        <button
+                          onClick={() => { setActiveLesson(lesson); setActiveLessonView('pdf'); }}
+                          className={`w-full text-left flex items-center gap-2 p-2 pl-6 rounded-md transition text-sm ${activeLesson?.id === lesson.id && activeLessonView === 'pdf' ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'}`}
+                        >
+                          <FileText className="w-4 h-4 shrink-0 text-secondary" />
+                          <span className="flex-1 truncate leading-tight">Course Material (PDF)</span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="px-unit-md mt-auto">
           <a href="#" className="flex items-center gap-unit-md px-unit-md py-unit-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-variant/50 transition-colors duration-200 ease-in-out">
             <Settings className="w-5 h-5" />
             <span className="font-label-md text-label-md">Settings</span>
           </a>
-          <div className="mt-unit-lg px-unit-md pt-unit-md border-t border-white/5 flex items-center gap-unit-md cursor-pointer hover:bg-surface-variant/30 p-2 rounded-lg transition-colors">
+          <Link to="/dashboard" className="mt-unit-lg px-unit-md pt-unit-md border-t border-white/5 flex items-center gap-unit-md cursor-pointer hover:bg-surface-variant/30 p-2 rounded-lg transition-colors">
             <div className="w-10 h-10 rounded-full border border-white/10 bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold uppercase">
               {userName.substring(0,2)}
             </div>
@@ -85,7 +106,7 @@ const CoursePlayer = () => {
               <p className="font-label-md text-label-md text-on-surface truncate">{userName}</p>
               <p className="font-body-sm text-body-sm text-on-surface-variant truncate opacity-70">Student</p>
             </div>
-          </div>
+          </Link>
         </div>
       </nav>
 
@@ -120,33 +141,43 @@ const CoursePlayer = () => {
           {/* Left Column (Video & Info) */}
           <div className="lg:col-span-8 flex flex-col gap-unit-lg">
             
-            {/* Video Player Container */}
-            <div className="glass-panel rounded-xl overflow-hidden relative group shadow-[0_20px_40px_rgba(0,0,0,0.4)] aspect-video bg-black flex items-center justify-center">
-              {activeLesson?.videoUrl ? (
-                <div className="text-white">Video Player: {activeLesson.videoUrl}</div>
-              ) : (
-                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCOllAnLqSBNQ-Wu14JynSqZ2nFyjPU8OAtcKb_SjC9O4MPOHJtGwJ5QZCRu1XVS1xHYUIjS94E50HGoUIBofnMWAG-xqFNG_8cetcV7SvlbTPo-BkwX9zKi3upK_cnO0EzQ3tH0foJCC9AaMlCBRoIvWVzZEynjpVF_I1S6Uv29-i5UTL0FL4aii_OmT30U4UE7g1ps5XL1QbLyZFmcitgSXfMJTJWHcT0FSxl-AMjVIoVqMFWRAIEAA')" }}></div>
-              )}
-              
-              {!activeLesson?.videoUrl && (
-                <>
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
-                  <div className="absolute inset-0 flex flex-col justify-between p-unit-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
-                    <div className="flex justify-between items-start">
-                      <div className="bg-surface-container-high/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2">
-                        <PlayCircle className="text-primary w-4 h-4 fill-current" />
-                        <span className="font-label-sm text-label-sm text-on-surface font-medium">{activeLesson?.title || course.title}</span>
+            {/* Player Container */}
+            {activeLessonView === 'pdf' && activeLesson?.pdfUrl ? (
+              <div className="w-full h-[500px] md:h-[700px] rounded-xl overflow-hidden border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)] bg-surface-container">
+                <iframe 
+                  src={activeLesson.pdfUrl} 
+                  title="Course PDF Material"
+                  className="w-full h-full border-none bg-white"
+                ></iframe>
+              </div>
+            ) : (
+              <div className="glass-panel rounded-xl overflow-hidden relative group shadow-[0_20px_40px_rgba(0,0,0,0.4)] aspect-video bg-black flex items-center justify-center">
+                {activeLesson?.videoUrl ? (
+                  <div className="text-white">Video Player: {activeLesson.videoUrl}</div>
+                ) : (
+                  <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCOllAnLqSBNQ-Wu14JynSqZ2nFyjPU8OAtcKb_SjC9O4MPOHJtGwJ5QZCRu1XVS1xHYUIjS94E50HGoUIBofnMWAG-xqFNG_8cetcV7SvlbTPo-BkwX9zKi3upK_cnO0EzQ3tH0foJCC9AaMlCBRoIvWVzZEynjpVF_I1S6Uv29-i5UTL0FL4aii_OmT30U4UE7g1ps5XL1QbLyZFmcitgSXfMJTJWHcT0FSxl-AMjVIoVqMFWRAIEAA')" }}></div>
+                )}
+                
+                {!activeLesson?.videoUrl && (
+                  <>
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
+                    <div className="absolute inset-0 flex flex-col justify-between p-unit-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
+                      <div className="flex justify-between items-start">
+                        <div className="bg-surface-container-high/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2">
+                          <PlayCircle className="text-primary w-4 h-4 fill-current" />
+                          <span className="font-label-sm text-label-sm text-on-surface font-medium">{activeLesson?.title || course.title}</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-center items-center flex-grow cursor-pointer group/play">
+                        <div className="w-16 h-16 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center backdrop-blur-md group-hover/play:bg-primary/40 group-hover/play:scale-110 transition-all duration-300 shadow-[0_0_30px_rgba(208,188,255,0.3)]">
+                          <Play className="text-primary w-8 h-8 fill-current ml-1" />
+                        </div>
                       </div>
                     </div>
-                    <div className="flex justify-center items-center flex-grow cursor-pointer group/play">
-                      <div className="w-16 h-16 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center backdrop-blur-md group-hover/play:bg-primary/40 group-hover/play:scale-110 transition-all duration-300 shadow-[0_0_30px_rgba(208,188,255,0.3)]">
-                        <Play className="text-primary w-8 h-8 fill-current ml-1" />
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Course Content Area */}
             <div className="flex flex-col gap-unit-lg">
@@ -158,6 +189,7 @@ const CoursePlayer = () => {
                 </div>
               </div>
 
+
               {/* Tabs */}
               <div className="border-b border-white/10 flex gap-unit-lg font-label-md text-label-md">
                 <button 
@@ -167,45 +199,12 @@ const CoursePlayer = () => {
                   Overview
                   {activeTab === 'Overview' && <div className="absolute -bottom-[1px] left-0 w-full h-[2px] bg-primary shadow-[0_-2px_8px_rgba(208,188,255,0.6)] rounded-t-full"></div>}
                 </button>
-                <button 
-                  onClick={() => setActiveTab('Curriculum')} 
-                  className={`pb-2 px-1 relative transition-colors ${activeTab === 'Curriculum' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
-                >
-                  Curriculum
-                  {activeTab === 'Curriculum' && <div className="absolute -bottom-[1px] left-0 w-full h-[2px] bg-primary shadow-[0_-2px_8px_rgba(208,188,255,0.6)] rounded-t-full"></div>}
-                </button>
               </div>
 
               {/* Tab Content */}
               {activeTab === 'Overview' && (
                 <div className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
                   <p>{activeLesson?.content || course.description}</p>
-                </div>
-              )}
-              
-              {activeTab === 'Curriculum' && (
-                <div className="space-y-4">
-                  {course.modules.map(module => (
-                    <div key={module.id} className="bg-surface-container rounded-lg p-4 border border-white/5">
-                      <h4 className="font-bold text-on-surface mb-3 flex items-center gap-2">
-                        <span className="bg-surface-variant text-on-surface px-2 py-0.5 rounded text-xs">Module {module.order}</span>
-                        {module.title}
-                      </h4>
-                      <div className="space-y-2 pl-2 border-l-2 border-surface-variant ml-2">
-                        {module.lessons.map(lesson => (
-                          <button
-                            key={lesson.id}
-                            onClick={() => setActiveLesson(lesson)}
-                            className={`w-full text-left flex items-center gap-3 p-2 rounded-md transition border ${activeLesson?.id === lesson.id ? 'bg-primary/10 border-primary/30 text-primary' : 'border-transparent text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'}`}
-                          >
-                            {lesson.videoUrl ? <PlayCircle className="w-4 h-4 shrink-0" /> : <FileText className="w-4 h-4 shrink-0" />}
-                            <span className="flex-1 text-sm font-medium">{lesson.title}</span>
-                            <span className="text-xs opacity-70">{lesson.duration ? `${lesson.duration} min` : ''}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
                 </div>
               )}
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { GET_DASHBOARD_DATA } from '../graphql/dashboardQueries';
 import Sidebar from '../components/layout/Sidebar';
 import TopBar from '../components/layout/TopBar';
@@ -35,7 +35,15 @@ const Dashboard = () => {
   const { data } = useQuery(GET_DASHBOARD_DATA);
   
   // Use GraphQL data if available, otherwise fallback to mock data
-  const dashboardData = data?.me || MOCK_DATA.me;
+  const dashboardData = data?.me ? {
+    ...MOCK_DATA.me,
+    ...data.me,
+    points: data.me.points ?? MOCK_DATA.me.points,
+    scholarStatus: data.me.scholarStatus ?? MOCK_DATA.me.scholarStatus,
+    weeklyGoal: data.me.weeklyGoal ?? MOCK_DATA.me.weeklyGoal,
+    recentActivity: data.me.recentActivity?.length ? data.me.recentActivity : MOCK_DATA.me.recentActivity,
+    certificates: data.me.certificates?.length ? data.me.certificates : MOCK_DATA.me.certificates,
+  } : MOCK_DATA.me;
 
   return (
     <div className="bg-background text-on-surface font-body-md min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">

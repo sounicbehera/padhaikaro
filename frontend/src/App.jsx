@@ -8,6 +8,7 @@ import Landing from './pages/Landing';
 
 import AdminDashboard from './pages/AdminDashboard';
 import AdminCourseEditor from './pages/AdminCourseEditor';
+import Dashboard from './pages/Dashboard';
 
 const Navbar = () => {
   const token = localStorage.getItem('token');
@@ -74,6 +75,7 @@ const AppLayout = () => {
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/course/:slug" element={<CoursePlayer />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/course/:slug" element={<AdminCourseEditor />} />

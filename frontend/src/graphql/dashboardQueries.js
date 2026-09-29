@@ -27,8 +27,14 @@ export const GET_DASHBOARD_DATA = gql`
         type
       }
     }
-    notifications {
-      unreadCount
+  }
+`;
+
+export const UPLOAD_AVATAR = gql`
+  mutation UploadAvatar($base64Image: String!) {
+    uploadAvatar(base64Image: $base64Image) {
+      id
+      avatar
     }
   }
 `;

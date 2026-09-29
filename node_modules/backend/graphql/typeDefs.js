@@ -1,10 +1,35 @@
 const typeDefs = `#graphql
+  type WeeklyGoal {
+    targetHours: Int
+    completedPercentage: Float
+  }
+
+  type Activity {
+    id: ID
+    title: String
+    subtitle: String
+    type: String
+    timeAgo: String
+  }
+
+  type Certificate {
+    id: ID
+    title: String
+    issueDate: String
+    type: String
+  }
+
   type User {
     id: ID!
     name: String!
     email: String!
     role: String!
     avatar: String
+    points: Int
+    scholarStatus: String
+    weeklyGoal: WeeklyGoal
+    recentActivity: [Activity]
+    certificates: [Certificate]
     enrolledCourses: [Course]
   }
 
@@ -80,6 +105,8 @@ const typeDefs = `#graphql
     
     enrollStudent(courseId: ID!): Enrollment
     markLessonComplete(enrollmentId: ID!, lessonId: ID!): Enrollment
+    uploadAvatar(base64Image: String!): User
+    uploadMedia(base64Data: String!, mediaType: String!): String!
   }
 `;
 

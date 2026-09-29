@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { gql } from '@apollo/client';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { useParams, Link } from 'react-router-dom';
@@ -77,6 +77,12 @@ const DELETE_LESSON = gql`
   }
 `;
 
+const UPLOAD_MEDIA = gql`
+  mutation UploadMedia($base64Data: String!, $mediaType: String!) {
+    uploadMedia(base64Data: $base64Data, mediaType: $mediaType)
+  }
+`;
+
 const AdminCourseEditor = () => {
     const { slug } = useParams();
     const { loading, error, data, refetch } = useQuery(GET_COURSE_DETAILS, { variables: { slug } });
@@ -87,6 +93,7 @@ const AdminCourseEditor = () => {
     const [createLesson] = useMutation(CREATE_LESSON);
     const [updateLesson] = useMutation(UPDATE_LESSON);
     const [deleteLesson] = useMutation(DELETE_LESSON);
+    const [uploadMedia, { loading: uploading }] = useMutation(UPLOAD_MEDIA);
 
     const [moduleTitle, setModuleTitle] = useState('');
     const [activeModule, setActiveModule] = useState(null);
@@ -100,6 +107,27 @@ const AdminCourseEditor = () => {
     if (error || !data.getCourse) return <div className="text-center py-10 text-error">Error loading course</div>;
 
     const course = data.getCourse;
+
+    const handleFileUpload = (e, type) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            try {
+                const res = await uploadMedia({ variables: { base64Data: reader.result, mediaType: type } });
+                if (type === 'video') {
+                    setLessonData(prev => ({ ...prev, videoUrl: res.data.uploadMedia }));
+                } else {
+                    setLessonData(prev => ({ ...prev, pdfUrl: res.data.uploadMedia }));
+                }
+            } catch (err) {
+                alert('Upload failed: ' + err.message);
+            }
+        };
+        reader.onerror = () => alert('Failed to read file');
+    };
 
     const handleAddModule = async (e) => {
         e.preventDefault();
@@ -233,8 +261,35 @@ const AdminCourseEditor = () => {
                             <div className="p-4 border-b border-outline-variant bg-surface">
                                 <form onSubmit={handleAddLesson} className="space-y-3">
                                     <input required type="text" placeholder="Lesson Title" className="w-full bg-surface-container text-on-surface p-2 rounded border border-outline text-sm focus:outline-none focus:border-primary" value={lessonData.title} onChange={e => setLessonData({ ...lessonData, title: e.target.value })} />
-                                    <input type="url" placeholder="Video URL (e.g., YouTube or MP4 link)" className="w-full bg-surface-container text-on-surface p-2 rounded border border-outline text-sm focus:outline-none focus:border-primary" value={lessonData.videoUrl} onChange={e => setLessonData({ ...lessonData, videoUrl: e.target.value })} />
-                                    <input type="url" placeholder="PDF Document URL" className="w-full bg-surface-container text-on-surface p-2 rounded border border-outline text-sm focus:outline-none focus:border-primary" value={lessonData.pdfUrl} onChange={e => setLessonData({ ...lessonData, pdfUrl: e.target.value })} />
+                                    
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs text-on-surface-variant font-medium">Video URL (or upload)</label>
+                                        <div className="flex gap-2 items-center">
+                                            <input type="url" placeholder="Video URL" className="flex-grow bg-surface-container text-on-surface p-2 rounded border border-outline text-sm focus:outline-none focus:border-primary" value={lessonData.videoUrl} onChange={e => setLessonData({ ...lessonData, videoUrl: e.target.value })} />
+                                            <label className={`cursor-pointer bg-surface-variant hover:bg-surface text-on-surface px-3 py-2 rounded text-sm whitespace-nowrap ${uploading ? 'opacity-50' : ''}`}>
+                                                Upload Video
+                                                <input type="file" accept="video/*" className="hidden" onChange={e => handleFileUpload(e, 'video')} disabled={uploading} />
+                                            </label>
+                                            {lessonData.videoUrl && (
+                                                <button type="button" onClick={() => setLessonData({ ...lessonData, videoUrl: '' })} className="text-error text-sm px-2 hover:underline">Remove</button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs text-on-surface-variant font-medium">PDF Document URL (or upload)</label>
+                                        <div className="flex gap-2 items-center">
+                                            <input type="url" placeholder="PDF URL" className="flex-grow bg-surface-container text-on-surface p-2 rounded border border-outline text-sm focus:outline-none focus:border-primary" value={lessonData.pdfUrl} onChange={e => setLessonData({ ...lessonData, pdfUrl: e.target.value })} />
+                                            <label className={`cursor-pointer bg-surface-variant hover:bg-surface text-on-surface px-3 py-2 rounded text-sm whitespace-nowrap ${uploading ? 'opacity-50' : ''}`}>
+                                                Upload PDF
+                                                <input type="file" accept="application/pdf" className="hidden" onChange={e => handleFileUpload(e, 'pdf')} disabled={uploading} />
+                                            </label>
+                                            {lessonData.pdfUrl && (
+                                                <button type="button" onClick={() => setLessonData({ ...lessonData, pdfUrl: '' })} className="text-error text-sm px-2 hover:underline">Remove</button>
+                                            )}
+                                        </div>
+                                    </div>
+
                                     <textarea placeholder="Text Content or Notes" rows="2" className="w-full bg-surface-container text-on-surface p-2 rounded border border-outline text-sm focus:outline-none focus:border-primary" value={lessonData.content} onChange={e => setLessonData({ ...lessonData, content: e.target.value })}></textarea>
                                     <div className="flex justify-end gap-2">
                                         <button type="button" onClick={() => { setActiveModule(null); setEditingLessonId(null); setLessonData({ title: '', videoUrl: '', pdfUrl: '', content: '' }); }} className="px-4 py-2 text-on-surface-variant hover:bg-surface-variant rounded text-sm font-medium transition">Cancel</button>

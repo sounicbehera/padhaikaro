@@ -148,6 +148,54 @@ const resolvers = {
       // Here we just add it. A real system would calculate percentage based on total course lessons.
       await enrollment.save();
       return enrollment.populate('completedLessons');
+    },
+    uploadAvatar: async (_, { base64Image }, { user }) => {
+      checkAuth(user);
+      try {
+        // Cloudinary config is automatically picked up from CLOUDINARY_URL in .env
+        const cloudinary = require('cloudinary').v2;
+        const result = await cloudinary.uploader.upload(base64Image, {
+          folder: 'lms/avatars',
+          allowed_formats: ['jpg', 'png', 'jpeg', 'webp']
+        });
+        const updatedUser = await User.findByIdAndUpdate(user._id, { avatar: result.secure_url }, { new: true });
+        return updatedUser;
+      } catch (error) {
+        throw new Error('Failed to upload image: ' + error.message);
+      }
+    },
+    uploadMedia: async (_, { base64Data, mediaType }, { user }) => {
+      checkRole(user, ['Instructor', 'Admin']);
+      try {
+        const cloudinary = require('cloudinary').v2;
+        
+        let targetUrl = '';
+        if (mediaType === 'video') targetUrl = process.env.CLOUDINARY_URL_VIDEO;
+        else if (mediaType === 'pdf') targetUrl = process.env.CLOUDINARY_URL_PDF;
+        else throw new Error('Invalid media type');
+
+        let options = { folder: 'lms/course_materials' };
+
+        if (targetUrl) {
+           const match = targetUrl.match(/cloudinary:\/\/([^:]+):([^@]+)@(.+)/);
+           if (match) {
+              options.api_key = match[1];
+              options.api_secret = match[2];
+              options.cloud_name = match[3];
+           }
+        }
+
+        if (mediaType === 'video') {
+           options.resource_type = 'video';
+        } else if (mediaType === 'pdf') {
+           options.resource_type = 'raw';
+        }
+        
+        const result = await cloudinary.uploader.upload(base64Data, options);
+        return result.secure_url;
+      } catch (error) {
+        throw new Error('Failed to upload media: ' + error.message);
+      }
     }
   },
   // Type resolvers to map Mongoose _id to GraphQL id

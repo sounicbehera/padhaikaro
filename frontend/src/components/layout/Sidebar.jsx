@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
   return (
@@ -18,22 +19,22 @@ const Sidebar = () => {
       
       {/* Navigation Links */}
       <nav className="flex flex-col gap-unit-xs flex-grow font-label-md text-label-md">
-        <a href="#" className="flex items-center gap-unit-sm px-unit-md py-unit-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-200">
+        <Link to="/catalog" className="flex items-center gap-unit-sm px-unit-md py-unit-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-200">
           <span className="material-symbols-outlined text-xl">dashboard</span>
           Dashboard
-        </a>
-        <a href="#" className="flex items-center gap-unit-sm px-unit-md py-unit-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-200">
+        </Link>
+        <Link to="/catalog" className="flex items-center gap-unit-sm px-unit-md py-unit-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-200">
           <span className="material-symbols-outlined text-xl">school</span>
           My Courses
-        </a>
+        </Link>
         <a href="#" className="flex items-center gap-unit-sm px-unit-md py-unit-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-200">
           <span className="material-symbols-outlined text-xl">calendar_month</span>
           Schedule
         </a>
-        <a href="#" className="flex items-center gap-unit-sm px-unit-md py-unit-sm bg-secondary-container text-on-secondary-container rounded-lg duration-200">
+        <Link to="/dashboard" className="flex items-center gap-unit-sm px-unit-md py-unit-sm bg-secondary-container text-on-secondary-container rounded-lg duration-200">
           <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>settings</span>
           Settings
-        </a>
+        </Link>
       </nav>
       
       {/* Footer / CTA */}
