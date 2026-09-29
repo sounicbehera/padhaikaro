@@ -1,4 +1,4 @@
-# Scalable Online Learning Management System (LMS)
+# Scalable Online Learning Management System (LMS) 📖
 
 A production-grade Learning Management System engineered for scalability, real-time interactivity, and high availability. 
 

@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #131313;
+  --color-on-background: #e5e2e1;
+  --color-primary: #d0bcff;
+  --color-on-primary: #3c0091;
+  --color-primary-container: #a078ff;
+  --color-on-primary-container: #340080;
+  --color-secondary: #adc6ff;
+  --color-on-secondary: #002e6a;
+  --color-secondary-container: #0566d9;
+  --color-on-secondary-container: #e6ecff;
+  --color-tertiary: #4edea3;
+  --color-on-tertiary: #003824;
+  --color-tertiary-container: #00a572;
+  --color-on-tertiary-container: #00311f;
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+  --color-surface: #131313;
+  --color-on-surface: #e5e2e1;
+  --color-surface-variant: #353534;
+  --color-on-surface-variant: #cbc3d7;
+  --color-outline: #958ea0;
+  --color-outline-variant: #494454;
+  
+  --color-surface-container-highest: #353534;
+  --color-surface-container-high: #2a2a2a;
+  --color-surface-container: #201f1f;
+  --color-surface-container-low: #1c1b1b;
+  --color-surface-container-lowest: #0e0e0e;
+  
+  --color-primary-fixed: #e9ddff;
+  --color-primary-fixed-dim: #d0bcff;
+  --color-secondary-fixed: #d8e2ff;
+  --color-secondary-fixed-dim: #adc6ff;
+  --color-tertiary-fixed: #6ffbbe;
+  --color-tertiary-fixed-dim: #4edea3;
+
+  --font-body-sm: "Inter", sans-serif;
+  --font-label-sm: "JetBrains Mono", monospace;
+  --font-headline-lg-mobile: "Geist", sans-serif;
+  --font-headline-lg: "Geist", sans-serif;
+  --font-body-lg: "Inter", sans-serif;
+  --font-headline-md: "Geist", sans-serif;
+  --font-body-md: "Inter", sans-serif;
+  --font-label-md: "JetBrains Mono", monospace;
+  --font-headline-sm: "Geist", sans-serif;
+
+  --spacing-margin-mobile: 16px;
+  --spacing-gutter: 24px;
+  --spacing-margin-desktop: 40px;
+  --spacing-unit-md: 16px;
+  --spacing-unit-lg: 24px;
+  --spacing-container-max: 1440px;
+  --spacing-unit-xl: 48px;
+  --spacing-unit-sm: 8px;
+  --spacing-unit-xs: 4px;
+
+  /* Fluid Typography using clamp() */
+  --text-headline-lg-mobile: clamp(1.75rem, 4vw, 2.5rem);
+  --text-headline-lg: clamp(2rem, 5vw, 3.5rem);
+  --text-headline-md: clamp(1.5rem, 3vw, 2.25rem);
+  --text-headline-sm: clamp(1.25rem, 2.5vw, 1.75rem);
+  --text-body-lg: clamp(1rem, 2vw, 1.25rem);
+  --text-body-md: clamp(0.875rem, 1.5vw, 1rem);
+  --text-body-sm: clamp(0.75rem, 1.2vw, 0.875rem);
+  --text-label-md: clamp(0.75rem, 1.2vw, 0.875rem);
+  --text-label-sm: 0.75rem;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  display: flex;
+  min-height: 100vh;
+}
+
+#root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Glassmorphism */
+.glass-panel {
+  background-color: var(--color-surface-container-high);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.glass-nav {
+  background-color: rgba(30, 30, 30, 0.6);
+  backdrop-filter: blur(12px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-container-lowest);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-variant);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline);
+}
+
+/* Auth glow */
+.input-glow:focus {
+  box-shadow: 0 0 0 2px rgba(208, 188, 255, 0.2);
+  border-color: #d0bcff;
+}
