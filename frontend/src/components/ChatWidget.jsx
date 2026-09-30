@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
 import { Send } from 'lucide-react';
 
-const socket = io('http://localhost:4000');
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const socket = io(API_URL);
 
 const ChatWidget = ({ courseId, userName }) => {
   const sessionKey = `chat_messages_${courseId}`;
@@ -99,7 +100,7 @@ const ChatWidget = ({ courseId, userName }) => {
           value={input} 
           onChange={(e) => setInput(e.target.value)} 
           placeholder="Ask a question..."
-          className="flex-1 rounded-md border-gray-300 shadow-sm p-2 text-sm focus:border-brand-500 focus:ring-brand-500"
+          className="flex-1 rounded-md border-gray-300 shadow-sm p-2 text-sm text-black focus:border-brand-500 focus:ring-brand-500"
         />
         <button type="submit" className="p-2 bg-brand-600 text-white rounded-md hover:bg-brand-700">
           <Send className="w-4 h-4" />

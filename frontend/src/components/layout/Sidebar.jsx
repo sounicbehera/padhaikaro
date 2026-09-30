@@ -39,9 +39,7 @@ const Sidebar = () => {
       
       {/* Footer / CTA */}
       <div className="mt-auto flex flex-col gap-unit-sm">
-        <button className="w-full py-unit-sm px-unit-md bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">
-          Upgrade Plan
-        </button>
+        {/* Upgrade Plan button removed */}
         <div className="border-t border-white/5 my-unit-xs pt-unit-xs flex flex-col gap-unit-xs">
           <a href="#" className="flex items-center gap-unit-sm px-unit-md py-unit-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-200 font-label-md text-label-md">
             <span className="material-symbols-outlined text-xl">help</span>

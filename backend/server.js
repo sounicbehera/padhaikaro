@@ -18,14 +18,18 @@ const httpServer = createServer(app);
 // Socket.io setup
 const io = new Server(httpServer, {
   cors: {
-    origin: '*', 
-    methods: ['GET', 'POST']
+    origin: 'https://padhaikarolms.netlify.app', 
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 setupSockets(io);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://padhaikarolms.netlify.app',
+  credentials: true
+}));
 app.use(express.json({ limit: '500mb' }));
 
 const PORT = process.env.PORT || 4000;

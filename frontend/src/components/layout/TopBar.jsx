@@ -6,6 +6,7 @@ const TopBar = () => {
   // Stubbing Apollo Client useQuery for highly volatile state
   const { data } = useQuery(GET_DASHBOARD_DATA);
   const unreadCount = data?.notifications?.unreadCount || 0;
+  const userName = data?.me?.name || 'Student';
 
   return (
     <>
@@ -26,7 +27,7 @@ const TopBar = () => {
           <img 
             alt="Student Profile" 
             className="w-8 h-8 rounded-full border border-white/10 cursor-pointer active:scale-95 duration-200" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpIewJYdD7A379lP5z1UHiYQXOVQxuaibWdvDMWPSVF56AXDxzNMC5OFQJ-RtLbf3wJ6RoDxo6Y92rtKqRAN4Ykk724MRCf95fq1Q8tHm7qdA80YS0KYsTqwqrtpIKACk9HSkJHWRRs6ECf3kjQzK3oWE7Y2YNovi4-f14XHz8BVv5JBlpjYNAC-UTfPrM5gAp3-wnNGo0qpFeo5rUIr9UWAGwHfbtpib-y4-lp1-cvl9mKoYgwLJ4oA" 
+            src={`https://ui-avatars.com/api/?name=${userName}`}
           />
         </div>
       </nav>
@@ -54,7 +55,7 @@ const TopBar = () => {
           <img 
             alt="Student Profile" 
             className="w-10 h-10 rounded-full border border-white/10 cursor-pointer active:scale-95 duration-200" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAztuJnKKBfZQcXzzUYvG_GWyUqIkXxL4rHEH_AwDCDIvWSH6h4ijqt09N1Y2Z-llXcl_lmKNj_Oko7B5OwWHATZMPEuOAEqNs8_Dg6oGIvhAKYEbjnKgGYLGzy-AlyNc5dGae7SiXi1LJNDwPhOPXF6nau8WS1HaOkRqQQVm4mMTOxS-8ay9kOovIwPFT7HXBvTG-zoO820ZxFr7oUWDcyac7OO34wVwNE53S8aPmAr0Qju6VhSQExLQ" 
+            src={`https://ui-avatars.com/api/?name=${userName}`}
           />
         </div>
       </header>

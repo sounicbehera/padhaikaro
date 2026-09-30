@@ -8,7 +8,9 @@ import Landing from './pages/Landing';
 
 import AdminDashboard from './pages/AdminDashboard';
 import AdminCourseEditor from './pages/AdminCourseEditor';
+import AdminQuizManager from './pages/AdminQuizManager';
 import Dashboard from './pages/Dashboard';
+import QuizPage from './pages/QuizPage';
 
 const Navbar = () => {
   const token = localStorage.getItem('token');
@@ -43,13 +45,26 @@ const Navbar = () => {
                     Admin Panel
                   </Link>
                 )}
-                <button 
-                  onClick={handleLogout}
-                  className="flex items-center space-x-1 text-on-surface-variant hover:text-error transition"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span>Logout</span>
-                </button>
+                <div className="flex items-center gap-4">
+                  <button className="p-2 text-on-surface-variant hover:text-on-surface bg-surface-variant/30 hover:bg-surface-variant/50 rounded-full transition-colors relative flex items-center justify-center">
+                    <span className="material-symbols-outlined">notifications</span>
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+                  </button>
+                  <button 
+                    onClick={handleLogout}
+                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-error hover:bg-error/90 rounded-md transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                  <Link to="/dashboard" className="hover:opacity-80 transition-opacity">
+                    <img 
+                      src="https://ui-avatars.com/api/?name=Student" 
+                      alt="Dashboard" 
+                      className="w-8 h-8 rounded-full border border-outline-variant shadow-sm" 
+                    />
+                  </Link>
+                </div>
               </>
             ) : (
               <Link to="/auth" className="px-4 py-2 rounded-md bg-primary text-on-primary font-medium hover:bg-primary/90 transition">
@@ -65,7 +80,7 @@ const Navbar = () => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const isFullPage = location.pathname.startsWith('/course/') || location.pathname === '/auth' || location.pathname === '/';
+  const isFullPage = location.pathname.startsWith('/course/') || location.pathname.startsWith('/quiz/') || location.pathname === '/auth' || location.pathname === '/';
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background text-on-background">
@@ -77,7 +92,9 @@ const AppLayout = () => {
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/course/:slug" element={<CoursePlayer />} />
+          <Route path="/quiz/:subject" element={<QuizPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/quizzes" element={<AdminQuizManager />} />
           <Route path="/admin/course/:slug" element={<AdminCourseEditor />} />
         </Routes>
       </main>

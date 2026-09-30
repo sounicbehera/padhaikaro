@@ -62,12 +62,7 @@ const ProfileHeader = ({ userData }) => {
         </h1>
         {uploadError && <p className="text-error text-sm mb-2">{uploadError}</p>}
         
-        <div className="flex items-center gap-unit-sm mb-unit-md">
-          <span className="inline-flex items-center gap-1 bg-[#332A00] text-[#FFD700] px-3 py-1 rounded-full font-label-sm text-label-sm border border-[#FFD700]/30 shadow-[0_0_10px_rgba(255,215,0,0.2)]">
-            <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
-            {userData.scholarStatus}
-          </span>
-        </div>
+        {/* Scholar status removed */}
         
         <div className="w-full bg-surface-container-lowest rounded-lg p-unit-md border border-white/5 flex items-center justify-between mt-auto">
           <div>

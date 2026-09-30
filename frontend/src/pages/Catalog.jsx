@@ -2,6 +2,7 @@ import React from 'react';
 import { gql } from '@apollo/client';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { Link, useNavigate } from 'react-router-dom';
+import QuizContainer from '../components/quiz/QuizContainer';
 
 const GET_COURSES = gql`
   query GetCourses {
@@ -46,18 +47,18 @@ const Catalog = () => {
   const token = localStorage.getItem('token');
   const { loading: coursesLoading, error: coursesError, data: coursesData } = useQuery(GET_COURSES);
   const { loading: enrollmentsLoading, error: enrollmentsError, data: enrollmentsData } = useQuery(GET_MY_ENROLLMENTS, { skip: !token });
-  
+
   const [enroll, { loading: enrollLoading }] = useMutation(ENROLL_STUDENT);
   const navigate = useNavigate();
 
   if (coursesLoading || enrollmentsLoading) return <div className="text-center py-10">Loading courses...</div>;
-  
+
   if (coursesError) return <div className="text-center py-10 text-red-500">Error loading courses: {coursesError.message}</div>;
 
   const courses = coursesData?.getCourses || [];
   const enrolledCourses = enrollmentsData?.getMyEnrollments?.map(e => e.course) || [];
   const enrolledCourseIds = new Set(enrolledCourses.map(c => c.id));
-  
+
   const availableCourses = courses.filter(c => !enrolledCourseIds.has(c.id));
 
   const handleEnroll = async (courseId, slug) => {
@@ -87,7 +88,7 @@ const Catalog = () => {
           <span className="inline-block px-2 py-1 text-xs font-semibold rounded bg-primary-container text-on-primary-container">
             {course.category || 'General'}
           </span>
-          <span className="font-bold text-on-surface">${course.price || 'Free'}</span>
+          <span className="font-bold text-on-surface">{course.price || 'Free'}</span>
         </div>
         <h3 className="text-xl font-bold text-on-surface mb-2">{course.title}</h3>
         <p className="text-on-surface-variant text-sm mb-4 line-clamp-2">{course.description}</p>
@@ -97,14 +98,14 @@ const Catalog = () => {
           <span>{course.level || 'All Levels'}</span>
         </div>
         {isEnrolled ? (
-          <button 
+          <button
             onClick={() => navigate(`/course/${course.slug}`)}
             className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition"
           >
             Continue Course
           </button>
         ) : (
-          <button 
+          <button
             onClick={() => handleEnroll(course.id, course.slug)}
             disabled={enrollLoading}
             className="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-md font-medium transition disabled:opacity-50"
@@ -118,8 +119,10 @@ const Catalog = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8 text-on-surface">Dashboard</h1>
-      
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-on-surface">Course Catalog</h1>
+      </div>
+
       {token && enrolledCourses.length > 0 && (
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6 text-on-surface">My Enrolled Courses</h2>
@@ -138,6 +141,10 @@ const Catalog = () => {
         ) : (
           <p className="text-on-surface-variant">No more courses available right now.</p>
         )}
+      </div>
+
+      <div className="mt-16 border-t border-gray-200 pt-8">
+        <QuizContainer userName="Student" />
       </div>
     </div>
   );

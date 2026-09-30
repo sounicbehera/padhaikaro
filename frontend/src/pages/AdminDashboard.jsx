@@ -73,12 +73,20 @@ const AdminDashboard = () => {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-on-surface">Instructor Dashboard</h1>
-        <button 
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-primary text-on-primary rounded-md font-medium hover:bg-primary/90 transition"
-        >
-          {showForm ? 'Cancel' : 'Create New Course'}
-        </button>
+        <div className="flex gap-4">
+          <button 
+            onClick={() => navigate('/admin/quizzes')}
+            className="px-4 py-2 bg-surface-variant text-on-surface-variant rounded-md font-medium hover:bg-surface-variant/80 transition"
+          >
+            Manage Quizzes
+          </button>
+          <button 
+            onClick={() => setShowForm(!showForm)}
+            className="px-4 py-2 bg-primary text-on-primary rounded-md font-medium hover:bg-primary/90 transition"
+          >
+            {showForm ? 'Cancel' : 'Create New Course'}
+          </button>
+        </div>
       </div>
 
       {showForm && (
