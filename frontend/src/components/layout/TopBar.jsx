@@ -6,7 +6,18 @@ const TopBar = () => {
   // Stubbing Apollo Client useQuery for highly volatile state
   const { data } = useQuery(GET_DASHBOARD_DATA);
   const unreadCount = data?.notifications?.unreadCount || 0;
-  const userName = data?.me?.name || 'Student';
+  const userName = data?.me?.name || 'User Name';
+  const avatarUrl = data?.me?.avatar;
+
+  const getInitials = (name) => {
+    if (!name) return 'UN';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+  const initials = getInitials(userName);
 
   return (
     <>
@@ -24,11 +35,17 @@ const TopBar = () => {
             )}
           </button>
           <span className="material-symbols-outlined text-on-surface-variant font-medium hover:bg-surface-container-high/50 transition-colors cursor-pointer active:scale-95 duration-200 p-unit-xs rounded-full">inbox</span>
-          <img 
-            alt="Student Profile" 
-            className="w-8 h-8 rounded-full border border-white/10 cursor-pointer active:scale-95 duration-200" 
-            src={`https://ui-avatars.com/api/?name=${userName}`}
-          />
+          {avatarUrl ? (
+            <img 
+              alt="Profile" 
+              className="w-8 h-8 rounded-full border border-white/10 cursor-pointer active:scale-95 duration-200 object-cover" 
+              src={avatarUrl}
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full border border-white/10 cursor-pointer active:scale-95 duration-200 bg-primary flex items-center justify-center text-on-primary font-bold text-xs">
+              {initials}
+            </div>
+          )}
         </div>
       </nav>
 
@@ -52,11 +69,17 @@ const TopBar = () => {
           <button className="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-full transition-colors">
             <span className="material-symbols-outlined">inbox</span>
           </button>
-          <img 
-            alt="Student Profile" 
-            className="w-10 h-10 rounded-full border border-white/10 cursor-pointer active:scale-95 duration-200" 
-            src={`https://ui-avatars.com/api/?name=${userName}`}
-          />
+          {avatarUrl ? (
+            <img 
+              alt="Profile" 
+              className="w-10 h-10 rounded-full border border-white/10 cursor-pointer active:scale-95 duration-200 object-cover" 
+              src={avatarUrl}
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full border border-white/10 cursor-pointer active:scale-95 duration-200 bg-primary flex items-center justify-center text-on-primary font-bold text-sm">
+              {initials}
+            </div>
+          )}
         </div>
       </header>
     </>

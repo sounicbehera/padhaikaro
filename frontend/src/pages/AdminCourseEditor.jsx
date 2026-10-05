@@ -103,6 +103,10 @@ const AdminCourseEditor = () => {
     const [editingLessonId, setEditingLessonId] = useState(null);
     const [lessonData, setLessonData] = useState({ title: '', videoUrl: '', pdfUrl: '', content: '' });
 
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState('');
+
     if (loading) return <div className="text-center py-10 text-on-surface">Loading course...</div>;
     if (error || !data.getCourse) return <div className="text-center py-10 text-error">Error loading course</div>;
 
@@ -112,21 +116,56 @@ const AdminCourseEditor = () => {
         const file = e.target.files[0];
         if (!file) return;
 
+        setIsUploading(true);
+        setUploadProgress(0);
+        setUploadStatus('Reading file...');
+
         const reader = new FileReader();
-        reader.readAsDataURL(file);
+        reader.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percentLoaded = Math.round((event.loaded / event.total) * 40); // Reading takes up to 40%
+                setUploadProgress(percentLoaded);
+            }
+        };
+
         reader.onload = async () => {
+            setUploadProgress(40);
+            setUploadStatus('Uploading to cloud... Please wait.');
+            
+            // Simulate progress for the network upload portion
+            const interval = setInterval(() => {
+                setUploadProgress(prev => {
+                    if (prev >= 95) return 95;
+                    return prev + (Math.random() * 5); // Increment by up to 5% randomly
+                });
+            }, 800);
+
             try {
                 const res = await uploadMedia({ variables: { base64Data: reader.result, mediaType: type } });
+                clearInterval(interval);
+                setUploadProgress(100);
+                setUploadStatus('Upload Complete!');
+                
+                setTimeout(() => {
+                    setIsUploading(false);
+                }, 1000);
+
                 if (type === 'video') {
                     setLessonData(prev => ({ ...prev, videoUrl: res.data.uploadMedia }));
                 } else {
                     setLessonData(prev => ({ ...prev, pdfUrl: res.data.uploadMedia }));
                 }
             } catch (err) {
+                clearInterval(interval);
+                setIsUploading(false);
                 alert('Upload failed: ' + err.message);
             }
         };
-        reader.onerror = () => alert('Failed to read file');
+        reader.onerror = () => {
+            setIsUploading(false);
+            alert('Failed to read file');
+        };
+        reader.readAsDataURL(file);
     };
 
     const handleAddModule = async (e) => {
@@ -204,7 +243,25 @@ const AdminCourseEditor = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto relative">
+            {isUploading && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-md">
+                    <div className="bg-surface-container-high p-8 rounded-2xl shadow-2xl border border-outline-variant w-96 flex flex-col items-center">
+                        <div className="w-16 h-16 rounded-full border-4 border-surface-variant border-t-primary animate-spin mb-6"></div>
+                        <h3 className="text-xl font-bold text-on-surface mb-2">Uploading Media</h3>
+                        <p className="text-sm text-on-surface-variant mb-6 text-center">{uploadStatus}</p>
+                        
+                        <div className="w-full bg-surface-variant rounded-full h-3 mb-2 overflow-hidden shadow-inner">
+                            <div 
+                                className="bg-primary h-3 rounded-full transition-all duration-300 ease-out" 
+                                style={{ width: `${uploadProgress}%` }}
+                            ></div>
+                        </div>
+                        <p className="text-sm font-bold text-primary">{Math.round(uploadProgress)}%</p>
+                    </div>
+                </div>
+            )}
+
             <div className="mb-6">
                 <Link to="/admin" className="text-primary hover:underline mb-2 inline-block">← Back to Dashboard</Link>
                 <h1 className="text-3xl font-bold text-on-surface">Editing: {course.title}</h1>

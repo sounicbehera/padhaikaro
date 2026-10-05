@@ -36,10 +36,19 @@ const PUBLISH_COURSE = gql`
   }
 `;
 
+const PUSH_NOTIFICATION = gql`
+  mutation PushGlobalNotification($message: String!) {
+    pushGlobalNotification(message: $message) {
+      id
+    }
+  }
+`;
+
 const AdminDashboard = () => {
   const { loading, error, data, refetch } = useQuery(GET_MY_COURSES);
   const [createCourse, { loading: creating }] = useMutation(CREATE_COURSE);
   const [publishCourse] = useMutation(PUBLISH_COURSE);
+  const [pushNotification] = useMutation(PUSH_NOTIFICATION);
   const navigate = useNavigate();
 
   const [showForm, setShowForm] = useState(false);
@@ -69,11 +78,28 @@ const AdminDashboard = () => {
     }
   };
 
+  const handlePushNotification = async () => {
+    const message = prompt("Enter notification message to send to all students:");
+    if (!message) return;
+    try {
+      await pushNotification({ variables: { message } });
+      alert("Notification sent successfully!");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-on-surface">Instructor Dashboard</h1>
         <div className="flex gap-4">
+          <button 
+            onClick={handlePushNotification}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition"
+          >
+            Push Notification
+          </button>
           <button 
             onClick={() => navigate('/admin/quizzes')}
             className="px-4 py-2 bg-surface-variant text-on-surface-variant rounded-md font-medium hover:bg-surface-variant/80 transition"

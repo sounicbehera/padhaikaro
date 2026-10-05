@@ -19,6 +19,13 @@ const typeDefs = `#graphql
     type: String
   }
 
+  type Notification {
+    id: ID!
+    message: String!
+    isGlobal: Boolean
+    createdAt: String!
+  }
+
   type User {
     id: ID!
     name: String!
@@ -38,7 +45,7 @@ const typeDefs = `#graphql
     title: String!
     slug: String!
     description: String
-    instructor: User!
+    instructor: User
     price: Float
     category: String
     thumbnail: String
@@ -86,6 +93,8 @@ const typeDefs = `#graphql
     getCourse(slug: String!): Course
     getMyCourses: [Course]
     getMyEnrollments: [Enrollment]
+    getNotifications: [Notification]
+    getUnreadNotificationCount: Int
   }
 
   type Mutation {
@@ -110,6 +119,8 @@ const typeDefs = `#graphql
     markLessonComplete(enrollmentId: ID!, lessonId: ID!): Enrollment
     uploadAvatar(base64Image: String!): User
     uploadMedia(base64Data: String!, mediaType: String!): String!
+    pushGlobalNotification(message: String!): Notification
+    markNotificationsAsRead: Boolean
   }
 `;
 

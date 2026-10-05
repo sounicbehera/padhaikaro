@@ -44,7 +44,7 @@ const ENROLL_STUDENT = gql`
 `;
 
 const Catalog = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const { loading: coursesLoading, error: coursesError, data: coursesData } = useQuery(GET_COURSES);
   const { loading: enrollmentsLoading, error: enrollmentsError, data: enrollmentsData } = useQuery(GET_MY_ENROLLMENTS, { skip: !token });
 

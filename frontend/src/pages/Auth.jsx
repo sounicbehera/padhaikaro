@@ -49,7 +49,7 @@ const Auth = () => {
 
     const [login, { loading: loginLoading, error: loginError }] = useMutation(LOGIN_MUTATION, {
         onCompleted: (data) => {
-            localStorage.setItem('token', data.login.token);
+            sessionStorage.setItem('token', data.login.token);
             navigate('/catalog');
         },
         onError: (err) => {
@@ -67,7 +67,7 @@ const Auth = () => {
 
     const [verifyOTP, { loading: verifyLoading, error: verifyError }] = useMutation(VERIFY_OTP_MUTATION, {
         onCompleted: (data) => {
-            localStorage.setItem('token', data.verifyOTP.token);
+            sessionStorage.setItem('token', data.verifyOTP.token);
             navigate('/catalog');
         }
     });

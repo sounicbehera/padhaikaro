@@ -5,6 +5,7 @@ const Course = require('../models/Course');
 const Module = require('../models/Module');
 const Lesson = require('../models/Lesson');
 const Enrollment = require('../models/Enrollment');
+const Notification = require('../models/Notification');
 const { checkAuth, checkRole, JWT_SECRET } = require('../middleware/auth');
 
 const sendEmailViaBrevo = async (to, subject, htmlContent) => {
@@ -72,6 +73,15 @@ const resolvers = {
         path: 'modules',
         populate: { path: 'lessons' }
       });
+    },
+    getNotifications: async (_, __, { user }) => {
+      checkAuth(user);
+      return Notification.find({ isGlobal: true }).sort({ createdAt: -1 }).limit(20);
+    },
+    getUnreadNotificationCount: async (_, __, { user }) => {
+      checkAuth(user);
+      const lastRead = user.lastReadNotificationsAt || new Date(0);
+      return Notification.countDocuments({ isGlobal: true, createdAt: { $gt: lastRead } });
     }
   },
   Mutation: {
@@ -304,6 +314,18 @@ const resolvers = {
       } catch (error) {
         throw new Error('Failed to upload media: ' + error.message);
       }
+    },
+    pushGlobalNotification: async (_, { message }, { user }) => {
+      checkRole(user, ['Instructor', 'Admin']);
+      const notif = new Notification({ message, isGlobal: true, sender: user._id });
+      await notif.save();
+      return notif;
+    },
+    markNotificationsAsRead: async (_, __, { user }) => {
+      checkAuth(user);
+      user.lastReadNotificationsAt = new Date();
+      await user.save();
+      return true;
     }
   },
   // Type resolvers to map Mongoose _id to GraphQL id
@@ -320,6 +342,9 @@ const resolvers = {
     id: (parent) => parent._id.toString(),
   },
   Enrollment: {
+    id: (parent) => parent._id.toString(),
+  },
+  Notification: {
     id: (parent) => parent._id.toString(),
   }
 };

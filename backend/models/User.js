@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
   }],
   enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   isVerified: { type: Boolean, default: false },
+  lastReadNotificationsAt: { type: Date, default: Date.now },
   otp: { type: String },
   otpExpiry: { type: Date }
 }, { timestamps: true });

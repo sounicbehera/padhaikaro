@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Sparkles, Code, Terminal, ChevronRight } from 'lucide-react';
 
 const Landing = () => {
+  const isAuthenticated = !!sessionStorage.getItem('token');
+  
   return (
     <div className="relative min-h-screen bg-background text-on-background flex flex-col">
       {/* Background Mesh Gradient Effects */}
@@ -24,11 +26,13 @@ const Landing = () => {
               <span className="font-headline-md text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">LMS Pro</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link to="/auth" className="hidden md:inline-flex items-center text-on-surface-variant hover:text-white transition-colors font-medium">
-                Log In
-              </Link>
-              <Link to="/auth" className="px-5 py-2.5 rounded-full bg-white text-black font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-                Sign In / Sign Up
+              {!isAuthenticated && (
+                <Link to="/auth" className="hidden md:inline-flex items-center text-on-surface-variant hover:text-white transition-colors font-medium">
+                  Log In
+                </Link>
+              )}
+              <Link to={isAuthenticated ? "/dashboard" : "/auth"} className="px-5 py-2.5 rounded-full bg-white text-black font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                {isAuthenticated ? "Go to Dashboard" : "Sign In / Sign Up"}
               </Link>
             </div>
           </div>
@@ -56,13 +60,15 @@ const Landing = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up animation-delay-300 w-full sm:w-auto">
-            <Link to="/auth" className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-background font-bold text-base md:text-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(208,188,255,0.4)] flex items-center justify-center gap-2">
-              Start Learning Now
+            <Link to={isAuthenticated ? "/catalog" : "/auth"} className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-background font-bold text-base md:text-lg hover:opacity-90 transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(208,188,255,0.4)] flex items-center justify-center gap-2">
+              {isAuthenticated ? "Browse Catalog" : "Start Learning Now"}
               <ChevronRight className="w-5 h-5" />
             </Link>
-            <Link to="/auth" className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 rounded-full bg-surface-variant/30 border border-white/10 text-white font-medium text-base md:text-lg hover:bg-surface-variant/50 transition-all flex items-center justify-center">
-              Sign In to Account
-            </Link>
+            {!isAuthenticated && (
+              <Link to="/auth" className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 rounded-full bg-surface-variant/30 border border-white/10 text-white font-medium text-base md:text-lg hover:bg-surface-variant/50 transition-all flex items-center justify-center">
+                Sign In to Account
+              </Link>
+            )}
           </div>
 
           {/* Floating elements anchored to the 1200px container */}
@@ -94,7 +100,7 @@ const Landing = () => {
             ].map((course, idx) => (
               <Link 
                 key={idx} 
-                to="/auth" 
+                to={isAuthenticated ? "/catalog" : "/auth"} 
                 className="group relative p-8 rounded-3xl bg-surface-container/40 border border-white/10 hover:border-white/20 hover:bg-surface-container-high/60 transition-all duration-300 flex flex-col items-start gap-4 hover:-translate-y-2 shadow-lg hover:shadow-2xl"
               >
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${course.color} flex items-center justify-center shadow-lg`}>

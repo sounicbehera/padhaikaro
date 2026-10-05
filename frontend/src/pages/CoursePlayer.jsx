@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
 import ChatWidget from '../components/ChatWidget';
+import AdaptiveVideoPlayer from '../components/AdaptiveVideoPlayer';
 import { Play, PlayCircle, FileText, CheckCircle, Search, Bell, Settings, Calendar, LayoutDashboard, Menu, GraduationCap, MessageSquare } from 'lucide-react';
 
 const getProcessedPdfUrl = (url) => {
@@ -51,7 +52,7 @@ const CoursePlayer = () => {
 
   return (
     <div className="bg-background text-on-background font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex w-full">
-      
+
       {/* Side Navigation */}
       <nav className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col h-full py-unit-lg bg-surface-container-lowest border-r border-white/10 fixed left-0 top-0 w-[280px] z-50`}>
         <div className="px-unit-lg mb-unit-xl flex items-center gap-unit-md cursor-pointer hover:opacity-80 transition-opacity">
@@ -60,7 +61,7 @@ const CoursePlayer = () => {
           </div>
           <div>
             <h1 className="font-headline-sm text-headline-sm font-bold text-primary tracking-tight leading-none mb-1">LMS Pro</h1>
-            <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">University Portal</p>
+            <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">YOUR OWN COLLEGE</p>
           </div>
         </div>
 
@@ -87,7 +88,7 @@ const CoursePlayer = () => {
                         <span className="flex-1 truncate leading-tight">{lesson.title}</span>
                         {lesson.duration && <span className="text-[10px] opacity-70 shrink-0">{lesson.duration}m</span>}
                       </button>
-                      
+
                       {lesson.pdfUrl && (
                         <button
                           onClick={() => { setActiveLesson(lesson); setActiveLessonView('pdf'); }}
@@ -112,7 +113,7 @@ const CoursePlayer = () => {
           </a>
           <Link to="/dashboard" className="mt-unit-lg px-unit-md pt-unit-md border-t border-white/5 flex items-center gap-unit-md cursor-pointer hover:bg-surface-variant/30 p-2 rounded-lg transition-colors">
             <div className="w-10 h-10 rounded-full border border-white/10 bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold uppercase">
-              {userName.substring(0,2)}
+              {userName.split(' ').filter(Boolean).map(n => n[0]).join('').substring(0, 2)}
             </div>
             <div className="overflow-hidden">
               <p className="font-label-md text-label-md text-on-surface truncate">{userName}</p>
@@ -149,10 +150,10 @@ const CoursePlayer = () => {
 
         {/* Main Canvas */}
         <main className="flex-grow p-gutter md:p-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-gutter max-w-container-max mx-auto w-full">
-          
+
           {/* Left Column (Video & Info) */}
           <div className="lg:col-span-8 flex flex-col gap-unit-lg">
-            
+
             {/* Player Container */}
             {activeLessonView === 'pdf' ? (
               <div className="w-full h-[500px] md:h-[700px] rounded-xl overflow-hidden border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)] bg-surface-container relative flex items-center justify-center">
@@ -164,8 +165,8 @@ const CoursePlayer = () => {
                       <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                       <span className="text-on-surface-variant text-sm animate-pulse">Loading PDF Document...</span>
                     </div>
-                    <iframe 
-                      src={getProcessedPdfUrl(activeLesson.pdfUrl)} 
+                    <iframe
+                      src={getProcessedPdfUrl(activeLesson.pdfUrl)}
                       title="Course PDF Material"
                       className="w-full h-full border-none bg-white relative z-10"
                     ></iframe>
@@ -175,11 +176,11 @@ const CoursePlayer = () => {
             ) : (
               <div className="glass-panel rounded-xl overflow-hidden relative group shadow-[0_20px_40px_rgba(0,0,0,0.4)] aspect-video bg-black flex items-center justify-center">
                 {activeLesson?.videoUrl ? (
-                  <div className="text-white">Video Player: {activeLesson.videoUrl}</div>
+                  <AdaptiveVideoPlayer rawUrl={activeLesson.videoUrl} title={activeLesson.title} />
                 ) : (
                   <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCOllAnLqSBNQ-Wu14JynSqZ2nFyjPU8OAtcKb_SjC9O4MPOHJtGwJ5QZCRu1XVS1xHYUIjS94E50HGoUIBofnMWAG-xqFNG_8cetcV7SvlbTPo-BkwX9zKi3upK_cnO0EzQ3tH0foJCC9AaMlCBRoIvWVzZEynjpVF_I1S6Uv29-i5UTL0FL4aii_OmT30U4UE7g1ps5XL1QbLyZFmcitgSXfMJTJWHcT0FSxl-AMjVIoVqMFWRAIEAA')" }}></div>
                 )}
-                
+
                 {!activeLesson?.videoUrl && (
                   <>
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
@@ -207,15 +208,15 @@ const CoursePlayer = () => {
                 <h2 className="font-headline-md text-headline-md font-semibold text-on-surface mb-2">{activeLesson?.title || course.title}</h2>
                 <div className="flex items-center gap-unit-md font-label-sm text-label-sm text-on-surface-variant">
                   <span className="bg-surface-variant px-2 py-1 rounded text-on-surface">Instructor: {course.instructor.name}</span>
-                  <span className="flex items-center gap-1"><PlayCircle className="w-4 h-4"/> {activeLesson?.duration || 0} mins</span>
+                  <span className="flex items-center gap-1"><PlayCircle className="w-4 h-4" /> {activeLesson?.duration || 0} mins</span>
                 </div>
               </div>
 
 
               {/* Tabs */}
               <div className="border-b border-white/10 flex gap-unit-lg font-label-md text-label-md">
-                <button 
-                  onClick={() => setActiveTab('Overview')} 
+                <button
+                  onClick={() => setActiveTab('Overview')}
                   className={`pb-2 px-1 relative transition-colors ${activeTab === 'Overview' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
                 >
                   Overview

@@ -45,7 +45,7 @@ const Sidebar = () => {
             <span className="material-symbols-outlined text-xl">help</span>
             Help Center
           </a>
-          <a href="#" className="flex items-center gap-unit-sm px-unit-md py-unit-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-200 font-label-md text-label-md">
+          <a href="#" className="flex items-center gap-unit-sm px-unit-md py-unit-sm text-white bg-[#FF3B30] hover:bg-[#FF453A] rounded-lg transition-all duration-200 font-label-md text-label-md shadow-[0_0_15px_rgba(255,59,48,0.4)]">
             <span className="material-symbols-outlined text-xl">logout</span>
             Logout
           </a>

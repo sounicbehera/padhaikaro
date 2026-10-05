@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { gql } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { BookOpen, LogOut } from 'lucide-react';
 import Catalog from './pages/Catalog';
 import CoursePlayer from './pages/CoursePlayer';
@@ -13,7 +15,7 @@ import Dashboard from './pages/Dashboard';
 import QuizPage from './pages/QuizPage';
 
 const Navbar = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const [isAuthenticated, setIsAuthenticated] = useState(!!token);
   
   let userRole = null;
@@ -24,9 +26,75 @@ const Navbar = () => {
     } catch(e) {}
   }
   
+  const GET_ME = gql`
+    query GetMe {
+      me {
+        id
+        name
+        avatar
+      }
+    }
+  `;
+
+  const GET_UNREAD_COUNT = gql`
+    query GetUnreadCount {
+      getUnreadNotificationCount
+    }
+  `;
+
+  const GET_NOTIFICATIONS = gql`
+    query GetNotifications {
+      getNotifications {
+        id
+        message
+        createdAt
+      }
+    }
+  `;
+
+  const MARK_AS_READ = gql`
+    mutation MarkAsRead {
+      markNotificationsAsRead
+    }
+  `;
+
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const { data } = useQuery(GET_ME, { skip: !isAuthenticated });
+  const { data: countData, refetch: refetchCount } = useQuery(GET_UNREAD_COUNT, { skip: !isAuthenticated, fetchPolicy: 'network-only' });
+  const { data: notifData, refetch: refetchNotifs } = useQuery(GET_NOTIFICATIONS, { skip: !isAuthenticated });
+  const [markAsRead] = useMutation(MARK_AS_READ);
+
+  const unreadCount = countData?.getUnreadNotificationCount || 0;
+  const notifications = notifData?.getNotifications || [];
+  const userName = data?.me?.name || 'User Name';
+  const avatarUrl = data?.me?.avatar;
+
+  const getInitials = (name) => {
+    if (!name) return 'UN';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+  const initials = getInitials(userName);
+  
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     window.location.href = '/auth';
+  };
+
+  const handleBellClick = async () => {
+    setShowNotifications(!showNotifications);
+    if (!showNotifications && unreadCount > 0) {
+      try {
+        await markAsRead();
+        refetchCount();
+      } catch (err) {
+        console.error(err);
+      }
+    }
   };
 
   return (
@@ -35,7 +103,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16 items-center">
           <Link to="/" className="flex items-center space-x-2">
             <BookOpen className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl text-on-surface">LMS Platform</span>
+            <span className="font-bold text-xl text-on-surface">PadhaiKaro LMS</span>
           </Link>
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
@@ -45,24 +113,58 @@ const Navbar = () => {
                     Admin Panel
                   </Link>
                 )}
-                <div className="flex items-center gap-4">
-                  <button className="p-2 text-on-surface-variant hover:text-on-surface bg-surface-variant/30 hover:bg-surface-variant/50 rounded-full transition-colors relative flex items-center justify-center">
-                    <span className="material-symbols-outlined">notifications</span>
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
-                  </button>
+                <div className="flex items-center gap-4 relative">
+                  <div className="relative">
+                    <button 
+                      onClick={handleBellClick}
+                      className="p-2 text-on-surface-variant hover:text-on-surface bg-surface-variant/30 hover:bg-surface-variant/50 rounded-full transition-colors relative flex items-center justify-center"
+                    >
+                      <span className="material-symbols-outlined">notifications</span>
+                      {unreadCount > 0 && (
+                        <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+                      )}
+                    </button>
+                    {showNotifications && (
+                      <div className="absolute right-0 mt-2 w-80 bg-surface-container rounded-lg shadow-lg border border-outline-variant z-50 overflow-hidden">
+                        <div className="p-4 border-b border-outline-variant bg-surface-container-highest">
+                          <h3 className="font-bold text-on-surface">Notifications</h3>
+                        </div>
+                        <div className="max-h-80 overflow-y-auto">
+                          {notifications.length === 0 ? (
+                            <div className="p-4 text-center text-sm text-on-surface-variant">No notifications yet.</div>
+                          ) : (
+                            notifications.map(n => (
+                              <div key={n.id} className="p-4 border-b border-outline-variant hover:bg-surface-variant/30">
+                                <p className="text-sm text-on-surface">{n.message}</p>
+                                <span className="text-xs text-on-surface-variant mt-1 block">
+                                  {new Date(parseInt(n.createdAt)).toLocaleString()}
+                                </span>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <button 
                     onClick={handleLogout}
-                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-error hover:bg-error/90 rounded-md transition-colors"
+                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-[#FF3B30] hover:bg-[#FF453A] rounded-md transition-colors shadow-[0_0_10px_rgba(255,59,48,0.3)]"
                   >
                     <LogOut className="h-4 w-4" />
                     <span>Logout</span>
                   </button>
                   <Link to="/dashboard" className="hover:opacity-80 transition-opacity">
-                    <img 
-                      src="https://ui-avatars.com/api/?name=Student" 
-                      alt="Dashboard" 
-                      className="w-8 h-8 rounded-full border border-outline-variant shadow-sm" 
-                    />
+                    {avatarUrl ? (
+                      <img 
+                        src={avatarUrl} 
+                        alt="Profile" 
+                        className="w-8 h-8 rounded-full border border-outline-variant shadow-sm object-cover" 
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full border border-outline-variant shadow-sm bg-primary flex items-center justify-center text-on-primary font-bold text-xs">
+                        {initials}
+                      </div>
+                    )}
                   </Link>
                 </div>
               </>
