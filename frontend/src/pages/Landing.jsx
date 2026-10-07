@@ -23,7 +23,7 @@ const Landing = () => {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
                 <BookOpen className="h-6 w-6 text-on-primary font-bold" />
               </div>
-              <span className="font-headline-md text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">LMS Pro</span>
+              <span className="font-headline-md text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">PadhaiKaro LMS</span>
             </div>
             <div className="flex items-center space-x-4">
               {!isAuthenticated && (

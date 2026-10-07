@@ -14,6 +14,7 @@ const GET_COURSES = gql`
       price
       category
       level
+      thumbnail
       instructor { name }
     }
   }
@@ -31,6 +32,7 @@ const GET_MY_ENROLLMENTS = gql`
         price
         category
         level
+        thumbnail
         instructor { name }
       }
     }
@@ -80,8 +82,15 @@ const Catalog = () => {
 
   const CourseCard = ({ course, isEnrolled }) => (
     <div key={course.id} className="bg-surface-container rounded-xl shadow-sm border border-outline-variant overflow-hidden hover:shadow-md transition">
-      <div className="h-48 bg-surface-variant flex items-center justify-center">
-        <span className="text-on-surface-variant">No Image</span>
+      <div className="h-48 bg-surface-variant flex items-center justify-center overflow-hidden">
+        {course.thumbnail ? (
+            <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
+        ) : (
+            <span className="text-on-surface-variant flex flex-col items-center gap-2">
+              <span className="material-symbols-outlined text-4xl">image</span>
+              No Image
+            </span>
+        )}
       </div>
       <div className="p-6">
         <div className="flex justify-between items-start mb-2">

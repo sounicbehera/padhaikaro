@@ -9,6 +9,7 @@ const GET_COURSE_DETAILS = gql`
       id
       title
       slug
+      thumbnail
       modules {
         id
         title
@@ -20,6 +21,15 @@ const GET_COURSE_DETAILS = gql`
           pdfUrl
         }
       }
+    }
+  }
+`;
+
+const UPDATE_COURSE = gql`
+  mutation UpdateCourse($courseId: ID!, $thumbnail: String) {
+    updateCourse(courseId: $courseId, thumbnail: $thumbnail) {
+      id
+      thumbnail
     }
   }
 `;
@@ -87,6 +97,7 @@ const AdminCourseEditor = () => {
     const { slug } = useParams();
     const { loading, error, data, refetch } = useQuery(GET_COURSE_DETAILS, { variables: { slug } });
 
+    const [updateCourse] = useMutation(UPDATE_COURSE);
     const [createModule] = useMutation(CREATE_MODULE);
     const [updateModule] = useMutation(UPDATE_MODULE);
     const [deleteModule] = useMutation(DELETE_MODULE);
@@ -165,6 +176,48 @@ const AdminCourseEditor = () => {
             setIsUploading(false);
             alert('Failed to read file');
         };
+        reader.readAsDataURL(file);
+    };
+
+    const handleThumbnailUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        setUploadProgress(0);
+        setUploadStatus('Uploading Thumbnail...');
+
+        const reader = new FileReader();
+        reader.onprogress = (event) => {
+            if (event.lengthComputable) {
+                setUploadProgress(Math.round((event.loaded / event.total) * 40));
+            }
+        };
+
+        reader.onload = async () => {
+            setUploadProgress(40);
+            
+            const interval = setInterval(() => {
+                setUploadProgress(prev => Math.min(prev + (Math.random() * 5), 95));
+            }, 800);
+
+            try {
+                const res = await uploadMedia({ variables: { base64Data: reader.result, mediaType: 'image' } });
+                await updateCourse({ variables: { courseId: course.id, thumbnail: res.data.uploadMedia } });
+                
+                clearInterval(interval);
+                setUploadProgress(100);
+                setUploadStatus('Thumbnail Updated!');
+                
+                setTimeout(() => setIsUploading(false), 1000);
+                refetch();
+            } catch (err) {
+                clearInterval(interval);
+                setIsUploading(false);
+                alert('Upload failed: ' + err.message);
+            }
+        };
+        reader.onerror = () => { setIsUploading(false); alert('Failed to read file'); };
         reader.readAsDataURL(file);
     };
 
@@ -265,6 +318,22 @@ const AdminCourseEditor = () => {
             <div className="mb-6">
                 <Link to="/admin" className="text-primary hover:underline mb-2 inline-block">← Back to Dashboard</Link>
                 <h1 className="text-3xl font-bold text-on-surface">Editing: {course.title}</h1>
+            </div>
+
+            <div className="bg-surface-container p-6 rounded-xl border border-outline-variant mb-8 flex gap-6 items-start">
+                <div className="flex-grow">
+                    <h2 className="text-xl font-bold text-on-surface mb-2">Course Thumbnail</h2>
+                    <p className="text-on-surface-variant text-sm mb-4">Upload a thumbnail image for the course catalog.</p>
+                    <label className={`cursor-pointer bg-primary text-on-primary px-4 py-2 rounded text-sm font-medium hover:bg-primary/90 transition ${uploading ? 'opacity-50' : ''}`}>
+                        Upload Image
+                        <input type="file" accept="image/*" className="hidden" onChange={handleThumbnailUpload} disabled={uploading} />
+                    </label>
+                </div>
+                {course.thumbnail && (
+                    <div className="w-48 h-32 rounded-lg overflow-hidden border border-outline-variant shrink-0 bg-surface">
+                        <img src={course.thumbnail} alt="Thumbnail" className="w-full h-full object-cover" />
+                    </div>
+                )}
             </div>
 
             <div className="bg-surface-container p-6 rounded-xl border border-outline-variant mb-8">

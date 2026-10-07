@@ -104,7 +104,8 @@ const typeDefs = `#graphql
     forgotPassword(email: String!): Boolean
     resetPassword(email: String!, otp: String!, newPassword: String!): Boolean
     
-    createCourse(title: String!, slug: String!, description: String, price: Float, category: String, level: String): Course
+    createCourse(title: String!, slug: String!, description: String, price: Float, category: String, level: String, thumbnail: String): Course
+    updateCourse(courseId: ID!, title: String, slug: String, description: String, price: Float, category: String, level: String, thumbnail: String): Course
     publishCourse(courseId: ID!): Course
     
     createModule(courseId: ID!, title: String!, order: Int!): Module

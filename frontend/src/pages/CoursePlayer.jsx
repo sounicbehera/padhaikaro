@@ -60,7 +60,7 @@ const CoursePlayer = () => {
             <GraduationCap className="text-on-primary font-bold h-6 w-6" />
           </div>
           <div>
-            <h1 className="font-headline-sm text-headline-sm font-bold text-primary tracking-tight leading-none mb-1">LMS Pro</h1>
+            <h1 className="font-headline-sm text-headline-sm font-bold text-primary tracking-tight leading-none mb-1">PadhaiKaro LMS</h1>
             <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">YOUR OWN COLLEGE</p>
           </div>
         </div>

@@ -110,7 +110,7 @@ const Auth = () => {
                 {/* Header */}
                 <div className="relative z-10 flex items-center gap-unit-sm">
                     <span className="material-symbols-outlined text-primary text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>integration_instructions</span>
-                    <span className="font-headline-sm text-headline-sm font-bold text-primary">LMS Pro</span>
+                    <span className="font-headline-sm text-headline-sm font-bold text-primary">PadhaiKaro LMS</span>
                 </div>
 
                 {/* Testimonial */}
@@ -131,7 +131,7 @@ const Auth = () => {
                     </div>
                 </div>
                 <div className="relative z-10">
-                    <p className="font-label-sm text-label-sm text-on-surface-variant">© 2024 LMS Pro. All rights reserved.</p>
+                    <p className="font-label-sm text-label-sm text-on-surface-variant">© 2024 PadhaiKaro LMS. All rights reserved.</p>
                 </div>
             </div>
 
@@ -141,7 +141,7 @@ const Auth = () => {
                     {/* Mobile Branding */}
                     <div className="flex lg:hidden items-center justify-center gap-unit-sm mb-unit-xl">
                         <span className="material-symbols-outlined text-primary text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>integration_instructions</span>
-                        <span className="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">LMS Pro</span>
+                        <span className="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">PadhaiKaro LMS</span>
                     </div>
 
                     {/* Tabs */}

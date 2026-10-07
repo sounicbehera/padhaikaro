@@ -22,7 +22,7 @@ const sendEmailViaBrevo = async (to, subject, htmlContent) => {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        sender: { name: 'LMS Pro', email: process.env.BREVO_SENDER_EMAIL || 'noreply@lmspro.com' },
+        sender: { name: 'PadhaiKaro LMS', email: process.env.BREVO_SENDER_EMAIL || 'noreply@padhaikarolms.com' },
         to: [{ email: to }],
         subject,
         htmlContent
@@ -99,7 +99,7 @@ const resolvers = {
       const userRole = role || 'Student'; // Default to student
       
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpiry = new Date(Date.now() + 60 * 1000); // 1 minute
+      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
       
       const user = new User({ 
         name, email, password: hashedPassword, role: userRole, 
@@ -110,8 +110,8 @@ const resolvers = {
       console.log(`[OTP] Registration OTP for ${email}: ${otp}`);
       await sendEmailViaBrevo(
         email, 
-        'Verify your LMS Pro Account', 
-        `<html><body><h2>Welcome to LMS Pro!</h2><p>Your OTP code to verify your account is: <strong>${otp}</strong></p><p>This code will expire in 1 minute.</p></body></html>`
+        'Verify your PadhaiKaro LMS Account', 
+        `<html><body><h2>Welcome to PadhaiKaro LMS!</h2><p>Your OTP code to verify your account is: <strong>${otp}</strong></p><p>This code will expire in 10 minutes.</p></body></html>`
       );
 
       setTimeout(async () => {
@@ -119,12 +119,12 @@ const resolvers = {
           const checkUser = await User.findById(user._id);
           if (checkUser && !checkUser.isVerified) {
             await User.deleteOne({ _id: user._id });
-            console.log(`[System] Deleted unverified user ${email} after 1 minute.`);
+            console.log(`[System] Deleted unverified user ${email} after 10 minutes.`);
           }
         } catch (e) {
           console.error('Error during automatic user deletion:', e);
         }
-      }, 60 * 1000);
+      }, 10 * 60 * 1000);
 
       return { token: null, user };
     },
@@ -166,7 +166,7 @@ const resolvers = {
       console.log(`[OTP] Password Reset OTP for ${email}: ${otp}`);
       await sendEmailViaBrevo(
         email, 
-        'Reset your LMS Pro Password', 
+        'Reset your PadhaiKaro LMS Password', 
         `<html><body><h2>Password Reset</h2><p>Your OTP code to reset your password is: <strong>${otp}</strong></p><p>This code will expire in 10 minutes. If you did not request a password reset, please ignore this email.</p></body></html>`
       );
       return true;
@@ -187,6 +187,16 @@ const resolvers = {
     createCourse: async (_, args, { user }) => {
       checkRole(user, ['Instructor', 'Admin']);
       const course = new Course({ ...args, instructor: user._id });
+      await course.save();
+      return course.populate('instructor');
+    },
+    updateCourse: async (_, { courseId, ...args }, { user }) => {
+      checkRole(user, ['Instructor', 'Admin']);
+      const course = await Course.findById(courseId);
+      if (course.instructor.toString() !== user._id.toString() && user.role !== 'Admin') {
+        throw new Error('Unauthorized');
+      }
+      Object.assign(course, args);
       await course.save();
       return course.populate('instructor');
     },
@@ -289,6 +299,7 @@ const resolvers = {
         let targetUrl = '';
         if (mediaType === 'video') targetUrl = process.env.CLOUDINARY_URL_VIDEO;
         else if (mediaType === 'pdf') targetUrl = process.env.CLOUDINARY_URL_PDF;
+        else if (mediaType === 'image') targetUrl = process.env.CLOUDINARY_URL;
         else throw new Error('Invalid media type');
 
         let options = { folder: 'lms/course_materials' };
@@ -307,6 +318,8 @@ const resolvers = {
         } else if (mediaType === 'pdf') {
            options.resource_type = 'image';
            options.format = 'pdf';
+        } else if (mediaType === 'image') {
+           options.resource_type = 'image';
         }
         
         const result = await cloudinary.uploader.upload(base64Data, options);
