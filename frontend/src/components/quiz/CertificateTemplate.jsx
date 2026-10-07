@@ -8,25 +8,35 @@ const CertificateTemplate = forwardRef(({ name, subject, score, total }, ref) =>
     <div className="absolute left-[-9999px] top-[-9999px]">
       <div 
         ref={ref} 
-        className="bg-white w-[800px] h-[600px] p-12 border-[16px] border-[#1a365d] flex flex-col items-center justify-center text-center font-sans"
+        className="w-[1280px] h-[1122px] relative flex flex-col items-center justify-center text-center font-sans overflow-hidden bg-white"
       >
-        <div className="border-[4px] border-solid border-gray-200 w-full h-full p-8 flex flex-col items-center">
-          <h1 className="text-5xl font-bold text-[#1a365d] mb-4 font-serif uppercase tracking-wider">Certificate of Completion</h1>
-          <p className="text-xl text-gray-600 mb-8 italic">This is to certify that</p>
-          <h2 className="text-4xl font-bold text-gray-800 mb-8 pb-2 border-b-2 border-gray-300 w-3/4">{name}</h2>
-          <p className="text-xl text-gray-600 mb-4">has successfully completed the assessment for</p>
-          <h3 className="text-3xl font-bold text-[#2b6cb0] mb-8">{subject} Certification</h3>
-          <p className="text-lg text-gray-700 mb-12">
-            Achieving a score of <span className="font-bold">{percentage}%</span> ({score}/{total})
+        {/* Background Image downloaded from Stitch */}
+        <img 
+          src="/assets/certificate_bg.png" 
+          alt="Certificate Background" 
+          className="absolute inset-0 w-full h-full object-cover z-0"
+          crossOrigin="anonymous"
+        />
+        
+        <div className="relative z-10 w-full h-full flex flex-col items-center pt-[480px]">
+          <h2 className="text-7xl font-bold text-[#1a365d] mb-[120px] font-serif uppercase tracking-widest drop-shadow-sm">{name}</h2>
+          
+          <h3 className="text-5xl font-bold text-[#b8860b] mb-[30px] drop-shadow-sm">{subject}</h3>
+          
+          <p className="text-3xl text-gray-800 font-medium bg-white/80 px-6 py-2 rounded-full shadow-sm">
+            Score: <span className="font-bold text-[#1a365d]">{percentage}%</span> ({score}/{total})
           </p>
-          <div className="flex justify-between w-full px-12 mt-auto">
-            <div className="text-left">
-              <p className="border-t-2 border-gray-800 w-40 text-center pt-2 font-semibold">Date</p>
-              <p className="text-center">{date}</p>
+
+          <div className="absolute bottom-[180px] left-0 w-full px-[220px] flex justify-between items-end">
+            <div className="text-center w-[280px]">
+              <p className="text-3xl text-gray-800 font-semibold mb-2">{date}</p>
+              <div className="h-[3px] bg-gray-800 w-full rounded-full"></div>
+              <p className="text-xl text-gray-700 mt-3 uppercase tracking-widest font-semibold">Date</p>
             </div>
-            <div className="text-right">
-              <p className="border-t-2 border-gray-800 w-40 text-center pt-2 font-semibold">Instructor Signature</p>
-              <p className="text-center font-cursive text-xl">LMS Admin</p>
+            <div className="text-center w-[280px]">
+              <p className="text-4xl text-gray-800 font-serif italic mb-2">Padhaikaro</p>
+              <div className="h-[3px] bg-gray-800 w-full rounded-full"></div>
+              <p className="text-xl text-gray-700 mt-3 uppercase tracking-widest font-semibold">Authorized Signatory</p>
             </div>
           </div>
         </div>

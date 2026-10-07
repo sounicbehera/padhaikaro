@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import CertificateTemplate from '../quiz/CertificateTemplate';
 
-const CertificateCard = ({ certificate }) => {
+const CertificateCard = ({ certificate, onDownload }) => {
   const isPrimary = certificate.type === 'primary';
   const iconColor = isPrimary ? 'text-primary' : 'text-secondary';
   const gradientLayer = isPrimary
@@ -19,7 +22,9 @@ const CertificateCard = ({ certificate }) => {
       <p className="text-on-surface-variant font-label-sm text-label-sm mb-unit-md">
         Issued: {certificate.issueDate}
       </p>
-      <button className="mt-auto w-full flex items-center justify-center gap-2 bg-transparent border border-white/10 text-on-surface py-2 rounded-lg font-label-md text-label-md hover:border-primary hover:text-primary transition-colors group-hover:bg-primary/5 cursor-pointer">
+      <button 
+        onClick={() => onDownload(certificate)}
+        className="mt-auto w-full flex items-center justify-center gap-2 bg-transparent border border-white/10 text-on-surface py-2 rounded-lg font-label-md text-label-md hover:border-primary hover:text-primary transition-colors group-hover:bg-primary/5 cursor-pointer">
         <span className="material-symbols-outlined text-[18px]">download</span>
         Download PDF
       </button>
@@ -28,16 +33,55 @@ const CertificateCard = ({ certificate }) => {
 };
 
 const EarnedCertificates = ({ certificates }) => {
+  const [downloadingCert, setDownloadingCert] = useState(null);
+  const certRef = useRef(null);
+
+  useEffect(() => {
+    if (downloadingCert && certRef.current) {
+      const processDownload = async () => {
+        try {
+          const canvas = await html2canvas(certRef.current, { scale: 2 });
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'px',
+            format: [1280, 1122]
+          });
+          pdf.addImage(imgData, 'PNG', 0, 0, 1280, 1122);
+          pdf.save(`${downloadingCert.subject || 'Certificate'}.pdf`);
+        } catch (err) {
+          console.error("Failed to generate PDF", err);
+        } finally {
+          setDownloadingCert(null);
+        }
+      };
+      
+      // Allow React to render the template first
+      setTimeout(processDownload, 100);
+    }
+  }, [downloadingCert]);
+
   if (!certificates || certificates.length === 0) return null;
 
   return (
-    <section className="w-full">
+    <section className="w-full relative">
       <h2 className="font-headline-sm text-headline-sm text-on-surface mb-unit-md">Earned Certificates</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-unit-md w-full">
         {certificates.map(cert => (
-          <CertificateCard key={cert.id} certificate={cert} />
+          <CertificateCard key={cert.id} certificate={cert} onDownload={setDownloadingCert} />
         ))}
       </div>
+      
+      {/* Hidden Certificate Template for downloading */}
+      {downloadingCert && (
+        <CertificateTemplate 
+          ref={certRef}
+          name={downloadingCert.name || "Student"} 
+          subject={downloadingCert.subject || downloadingCert.title}
+          score={downloadingCert.score || 100}
+          total={downloadingCert.total || 100}
+        />
+      )}
     </section>
   );
 };

@@ -116,7 +116,9 @@ const QuizPage = () => {
           title: `${activeSubject} Certification`,
           issueDate: new Date().toLocaleDateString(),
           type: 'primary',
-          subject: activeSubject
+          subject: activeSubject,
+          score: calculatedScore,
+          total: questions.length
         });
         localStorage.setItem('earnedCertificates', JSON.stringify(existingCerts));
       }
@@ -130,9 +132,9 @@ const QuizPage = () => {
     const pdf = new jsPDF({
       orientation: 'landscape',
       unit: 'px',
-      format: [800, 600]
+      format: [1280, 1122]
     });
-    pdf.addImage(imgData, 'PNG', 0, 0, 800, 600);
+    pdf.addImage(imgData, 'PNG', 0, 0, 1280, 1122);
     pdf.save(`${activeSubject}_Certificate.pdf`);
   };
 
