@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getQuizData as getFallbackData } from '../components/quiz/quizData';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, gql } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 
 const GET_QUIZZES = gql`
   query GetQuizzes {
