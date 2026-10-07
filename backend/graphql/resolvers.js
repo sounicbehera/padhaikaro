@@ -351,6 +351,17 @@ const resolvers = {
         await Quiz.insertMany(quizzes);
       }
       return true;
+    },
+    addCertificate: async (_, { title, issueDate, type }, { user }) => {
+      checkAuth(user);
+      const existingCert = user.certificates.find(c => c.title === title);
+      if (existingCert) {
+        existingCert.issueDate = issueDate;
+      } else {
+        user.certificates.push({ title, issueDate, type: type || 'primary' });
+      }
+      await user.save();
+      return user;
     }
   },
   // Type resolvers to map Mongoose _id to GraphQL id

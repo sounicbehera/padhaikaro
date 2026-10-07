@@ -5,7 +5,7 @@ const CertificateTemplate = forwardRef(({ name, subject, score, total }, ref) =>
   const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <div className="absolute left-[-9999px] top-[-9999px]">
+    <div className="absolute top-0 left-0 opacity-0 pointer-events-none -z-50 overflow-hidden" style={{ width: '1280px', height: '1122px' }}>
       <div 
         ref={ref} 
         className="w-[1280px] h-[1122px] relative flex flex-col items-center justify-center text-center font-sans overflow-hidden bg-white"
@@ -15,7 +15,6 @@ const CertificateTemplate = forwardRef(({ name, subject, score, total }, ref) =>
           src="/assets/certificate_bg.png" 
           alt="Certificate Background" 
           className="absolute inset-0 w-full h-full object-cover z-0"
-          crossOrigin="anonymous"
         />
         
         <div className="relative z-10 w-full h-full flex flex-col items-center pt-[480px]">

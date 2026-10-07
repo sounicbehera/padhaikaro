@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { toPng } from 'html-to-image';
+import { jsPDF } from 'jspdf';
 import CertificateTemplate from '../quiz/CertificateTemplate';
 
 const CertificateCard = ({ certificate, onDownload }) => {
@@ -40,8 +40,8 @@ const EarnedCertificates = ({ certificates }) => {
     if (downloadingCert && certRef.current) {
       const processDownload = async () => {
         try {
-          const canvas = await html2canvas(certRef.current, { scale: 2 });
-          const imgData = canvas.toDataURL('image/png');
+          console.log("Starting PDF generation for:", downloadingCert.title);
+          const imgData = await toPng(certRef.current, { pixelRatio: 2, fontEmbedCSS: '' });
           const pdf = new jsPDF({
             orientation: 'landscape',
             unit: 'px',
@@ -49,8 +49,10 @@ const EarnedCertificates = ({ certificates }) => {
           });
           pdf.addImage(imgData, 'PNG', 0, 0, 1280, 1122);
           pdf.save(`${downloadingCert.subject || 'Certificate'}.pdf`);
+          console.log("PDF downloaded successfully");
         } catch (err) {
           console.error("Failed to generate PDF", err);
+          alert("Failed to download the certificate: " + err.message);
         } finally {
           setDownloadingCert(null);
         }

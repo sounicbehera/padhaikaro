@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { toPng } from 'html-to-image';
+import { jsPDF } from 'jspdf';
 import { getQuizData as getFallbackData } from '../components/quiz/quizData';
 import { gql } from '@apollo/client';
-import { useQuery } from '@apollo/client/react';
+import { useQuery, useMutation } from '@apollo/client/react';
 import TimerWidget from '../components/quiz/TimerWidget';
 import QuestionCard from '../components/quiz/QuestionCard';
 import ResultSummary from '../components/quiz/ResultSummary';
 import CertificateTemplate from '../components/quiz/CertificateTemplate';
+import { GET_DASHBOARD_DATA } from '../graphql/dashboardQueries';
 
 const GET_QUIZZES = gql`
   query GetQuizzes {
@@ -24,12 +25,29 @@ const GET_QUIZZES = gql`
   }
 `;
 
+const ADD_CERTIFICATE = gql`
+  mutation AddCertificate($title: String!, $issueDate: String, $type: String) {
+    addCertificate(title: $title, issueDate: $issueDate, type: $type) {
+      id
+      certificates {
+        title
+        issueDate
+      }
+    }
+  }
+`;
+
 const QuizPage = () => {
   const { subject } = useParams();
   const navigate = useNavigate();
   const activeSubject = decodeURIComponent(subject);
   
   const { data: gqlData, loading } = useQuery(GET_QUIZZES, { fetchPolicy: 'network-only' });
+  const { data: dashboardData } = useQuery(GET_DASHBOARD_DATA);
+  const studentName = dashboardData?.me?.name || "Student";
+  const [addCertificate] = useMutation(ADD_CERTIFICATE, {
+    refetchQueries: [{ query: GET_DASHBOARD_DATA }]
+  });
   
   const [answers, setAnswers] = useState({});
   const [startTime, setStartTime] = useState(null);
@@ -109,33 +127,61 @@ const QuizPage = () => {
     setIsSubmitted(true);
 
     if (calculatedScore / questions.length >= 0.6) {
+      const issueDate = new Date().toLocaleDateString();
+      const title = `${activeSubject} Certification`;
+      
+      // Save to Backend Database
+      addCertificate({ variables: { title, issueDate, type: 'primary' } }).catch(e => console.error(e));
+
+      // Keep localStorage logic for offline/mock support
       const existingCerts = JSON.parse(localStorage.getItem('earnedCertificates') || '[]');
-      if (!existingCerts.find(c => c.subject === activeSubject)) {
+      const existingIndex = existingCerts.findIndex(c => c.subject === activeSubject);
+      
+      if (existingIndex !== -1) {
+        // Update the existing certificate
+        existingCerts[existingIndex].score = calculatedScore;
+        existingCerts[existingIndex].total = questions.length;
+        existingCerts[existingIndex].issueDate = issueDate;
+      } else {
+        // Add new certificate
         existingCerts.push({
           id: `cert-${Date.now()}`,
-          title: `${activeSubject} Certification`,
-          issueDate: new Date().toLocaleDateString(),
+          title: title,
+          issueDate: issueDate,
           type: 'primary',
           subject: activeSubject,
           score: calculatedScore,
-          total: questions.length
+          total: questions.length,
+          name: studentName
         });
-        localStorage.setItem('earnedCertificates', JSON.stringify(existingCerts));
       }
+      localStorage.setItem('earnedCertificates', JSON.stringify(existingCerts));
     }
   };
 
   const downloadCertificate = async () => {
-    if (!certRef.current) return;
-    const canvas = await html2canvas(certRef.current, { scale: 2 });
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF({
-      orientation: 'landscape',
-      unit: 'px',
-      format: [1280, 1122]
-    });
-    pdf.addImage(imgData, 'PNG', 0, 0, 1280, 1122);
-    pdf.save(`${activeSubject}_Certificate.pdf`);
+    try {
+      console.log("Starting PDF generation...");
+      if (!certRef.current) {
+        alert("Certificate template is not ready.");
+        return;
+      }
+      
+      const imgData = await toPng(certRef.current, { pixelRatio: 2, fontEmbedCSS: '' });
+      console.log("Image data generated successfully");
+      
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [1280, 1122]
+      });
+      pdf.addImage(imgData, 'PNG', 0, 0, 1280, 1122);
+      pdf.save(`${activeSubject}_Certificate.pdf`);
+      console.log("PDF downloaded successfully");
+    } catch (error) {
+      console.error("Failed to generate certificate:", error);
+      alert("Failed to download the certificate: " + error.message);
+    }
   };
 
   const closeQuiz = () => {
@@ -164,7 +210,7 @@ const QuizPage = () => {
         />
         <CertificateTemplate 
           ref={certRef}
-          name={"Student"} // In a real app we'd fetch the user's name
+          name={studentName}
           subject={activeSubject}
           score={score}
           total={questions.length}

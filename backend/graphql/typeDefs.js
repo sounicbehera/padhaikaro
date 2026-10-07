@@ -149,6 +149,7 @@ const typeDefs = `#graphql
     pushGlobalNotification(message: String!): Notification
     markNotificationsAsRead: Boolean
     saveQuizzes(quizzes: [QuizInput]!): Boolean
+    addCertificate(title: String!, issueDate: String, type: String): User
   }
 `;
 
