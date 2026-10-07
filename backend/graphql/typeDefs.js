@@ -87,6 +87,31 @@ const typeDefs = `#graphql
     user: User!
   }
 
+  type QuizQuestion {
+    id: String
+    question: String
+    options: [String]
+    answer: String
+  }
+  
+  type Quiz {
+    id: ID!
+    subject: String!
+    questions: [QuizQuestion]
+  }
+
+  input QuizQuestionInput {
+    id: String
+    question: String
+    options: [String]
+    answer: String
+  }
+
+  input QuizInput {
+    subject: String!
+    questions: [QuizQuestionInput]
+  }
+
   type Query {
     me: User
     getCourses(category: String, level: String): [Course]
@@ -95,6 +120,7 @@ const typeDefs = `#graphql
     getMyEnrollments: [Enrollment]
     getNotifications: [Notification]
     getUnreadNotificationCount: Int
+    getQuizzes: [Quiz]
   }
 
   type Mutation {
@@ -122,6 +148,7 @@ const typeDefs = `#graphql
     uploadMedia(base64Data: String!, mediaType: String!): String!
     pushGlobalNotification(message: String!): Notification
     markNotificationsAsRead: Boolean
+    saveQuizzes(quizzes: [QuizInput]!): Boolean
   }
 `;
 

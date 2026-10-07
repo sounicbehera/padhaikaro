@@ -2,16 +2,33 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { getQuizData } from '../components/quiz/quizData';
+import { getQuizData as getFallbackData } from '../components/quiz/quizData';
+import { useQuery, gql } from '@apollo/client';
 import TimerWidget from '../components/quiz/TimerWidget';
 import QuestionCard from '../components/quiz/QuestionCard';
 import ResultSummary from '../components/quiz/ResultSummary';
 import CertificateTemplate from '../components/quiz/CertificateTemplate';
 
+const GET_QUIZZES = gql`
+  query GetQuizzes {
+    getQuizzes {
+      subject
+      questions {
+        id
+        question
+        options
+        answer
+      }
+    }
+  }
+`;
+
 const QuizPage = () => {
   const { subject } = useParams();
   const navigate = useNavigate();
   const activeSubject = decodeURIComponent(subject);
+  
+  const { data: gqlData, loading } = useQuery(GET_QUIZZES, { fetchPolicy: 'network-only' });
   
   const [answers, setAnswers] = useState({});
   const [startTime, setStartTime] = useState(null);
@@ -63,8 +80,20 @@ const QuizPage = () => {
     setAnswers(prev => ({ ...prev, [questionId]: option }));
   };
 
+  const getQuizDataObj = () => {
+    let quizData = {};
+    if (gqlData && gqlData.getQuizzes && gqlData.getQuizzes.length > 0) {
+      gqlData.getQuizzes.forEach(q => {
+        quizData[q.subject] = q.questions;
+      });
+    } else {
+      quizData = getFallbackData();
+    }
+    return quizData;
+  };
+
   const submitQuiz = () => {
-    const quizData = getQuizData();
+    const quizData = getQuizDataObj();
     const questions = quizData[activeSubject];
     if (!questions) return;
     
@@ -112,7 +141,9 @@ const QuizPage = () => {
     navigate('/catalog'); // Fallback if window.close() doesn't work
   };
 
-  const quizData = getQuizData();
+  if (loading) return <div className="p-10 text-center text-on-surface">Loading quiz...</div>;
+
+  const quizData = getQuizDataObj();
   const questions = quizData[activeSubject];
   if (!questions) {
     return <div className="p-10 text-center text-on-surface">Quiz not found.</div>;

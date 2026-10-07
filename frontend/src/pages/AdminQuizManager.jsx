@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { getQuizData, saveQuizData } from '../components/quiz/quizData';
+import { getQuizData as getFallbackData } from '../components/quiz/quizData';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, gql } from '@apollo/client';
+
+const GET_QUIZZES = gql`
+  query GetQuizzes {
+    getQuizzes {
+      subject
+      questions {
+        id
+        question
+        options
+        answer
+      }
+    }
+  }
+`;
+
+const SAVE_QUIZZES = gql`
+  mutation SaveQuizzes($quizzes: [QuizInput]!) {
+    saveQuizzes(quizzes: $quizzes)
+  }
+`;
 
 const AdminQuizManager = () => {
   const [quizData, setQuizData] = useState({});
@@ -8,18 +29,47 @@ const AdminQuizManager = () => {
   const [editingQuestion, setEditingQuestion] = useState(null);
   const navigate = useNavigate();
 
+  const { data, loading } = useQuery(GET_QUIZZES, { fetchPolicy: 'network-only' });
+  const [saveQuizzesMut] = useMutation(SAVE_QUIZZES);
+
   useEffect(() => {
-    const data = getQuizData();
-    setQuizData(data);
-    const subjects = Object.keys(data);
+    if (loading) return;
+    let loadedData = {};
+    if (data && data.getQuizzes && data.getQuizzes.length > 0) {
+      data.getQuizzes.forEach(q => {
+        loadedData[q.subject] = q.questions.map(question => {
+          // Remove __typename before setting state
+          const { __typename, ...rest } = question;
+          return rest;
+        });
+      });
+    } else {
+      loadedData = getFallbackData();
+    }
+    setQuizData(loadedData);
+    const subjects = Object.keys(loadedData);
     if (subjects.length > 0) {
       setActiveSubject(subjects[0]);
     }
-  }, []);
+  }, [data, loading]);
 
-  const handleSave = () => {
-    saveQuizData(quizData);
-    alert('Quiz data saved successfully!');
+  const handleSave = async () => {
+    try {
+      const formattedQuizzes = Object.keys(quizData).map(subject => ({
+        subject,
+        questions: quizData[subject].map(q => ({
+          id: q.id,
+          question: q.question,
+          options: q.options,
+          answer: q.answer
+        }))
+      }));
+      await saveQuizzesMut({ variables: { quizzes: formattedQuizzes } });
+      alert('Quiz data saved successfully to database!');
+    } catch (e) {
+      console.error(e);
+      alert('Failed to save quiz data: ' + e.message);
+    }
   };
 
   const handleQuestionChange = (id, field, value) => {

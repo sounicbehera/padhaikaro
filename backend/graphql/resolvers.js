@@ -6,6 +6,7 @@ const Module = require('../models/Module');
 const Lesson = require('../models/Lesson');
 const Enrollment = require('../models/Enrollment');
 const Notification = require('../models/Notification');
+const Quiz = require('../models/Quiz');
 const { checkAuth, checkRole, JWT_SECRET } = require('../middleware/auth');
 
 const sendEmailViaBrevo = async (to, subject, htmlContent) => {
@@ -82,6 +83,9 @@ const resolvers = {
       checkAuth(user);
       const lastRead = user.lastReadNotificationsAt || new Date(0);
       return Notification.countDocuments({ isGlobal: true, createdAt: { $gt: lastRead } });
+    },
+    getQuizzes: async () => {
+      return Quiz.find();
     }
   },
   Mutation: {
@@ -339,6 +343,14 @@ const resolvers = {
       user.lastReadNotificationsAt = new Date();
       await user.save();
       return true;
+    },
+    saveQuizzes: async (_, { quizzes }, { user }) => {
+      checkRole(user, ['Admin', 'Instructor']);
+      await Quiz.deleteMany({});
+      if (quizzes && quizzes.length > 0) {
+        await Quiz.insertMany(quizzes);
+      }
+      return true;
     }
   },
   // Type resolvers to map Mongoose _id to GraphQL id
@@ -358,6 +370,9 @@ const resolvers = {
     id: (parent) => parent._id.toString(),
   },
   Notification: {
+    id: (parent) => parent._id.toString(),
+  },
+  Quiz: {
     id: (parent) => parent._id.toString(),
   }
 };
