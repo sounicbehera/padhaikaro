@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { toPng } from 'html-to-image';
-import { jsPDF } from 'jspdf';
+import { downloadCertificatePdf } from '../utils/certificateGenerator';
 import { getQuizData as getFallbackData } from '../components/quiz/quizData';
 import { gql } from '@apollo/client';
 import { useQuery, useMutation } from '@apollo/client/react';
@@ -54,6 +53,7 @@ const QuizPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [score, setScore] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
   const certRef = useRef(null);
   const DURATION = 30; // 30 minutes
 
@@ -160,27 +160,24 @@ const QuizPage = () => {
   };
 
   const downloadCertificate = async () => {
+    if (isDownloading) return;
     try {
-      console.log("Starting PDF generation...");
+      setIsDownloading(true);
+      console.log("Starting PDF generation for:", activeSubject);
       if (!certRef.current) {
-        alert("Certificate template is not ready.");
-        return;
+        throw new Error("Certificate template is not ready.");
       }
       
-      const imgData = await toPng(certRef.current, { pixelRatio: 2, fontEmbedCSS: '' });
-      console.log("Image data generated successfully");
-      
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'px',
-        format: [1280, 1122]
-      });
-      pdf.addImage(imgData, 'PNG', 0, 0, 1280, 1122);
-      pdf.save(`${activeSubject}_Certificate.pdf`);
+      const sanitizedName = (activeSubject || 'Certification').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const filename = `PadhaiKaro_${sanitizedName}_Certificate.pdf`;
+      await downloadCertificatePdf(certRef.current, filename);
       console.log("PDF downloaded successfully");
     } catch (error) {
       console.error("Failed to generate certificate:", error);
-      alert("Failed to download the certificate: " + error.message);
+      const errMsg = error?.message || (typeof error === 'string' ? error : 'An unexpected error occurred while generating the PDF.');
+      alert("Failed to download the certificate: " + errMsg);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -207,6 +204,7 @@ const QuizPage = () => {
           subject={activeSubject}
           onDownload={downloadCertificate}
           onClose={closeQuiz}
+          isDownloading={isDownloading}
         />
         <CertificateTemplate 
           ref={certRef}

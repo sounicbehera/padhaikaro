@@ -59,7 +59,7 @@ const Dashboard = () => {
             <RecentActivity activities={dashboardData.recentActivity} />
           </div>
           
-          <EarnedCertificates certificates={dashboardData.certificates} />
+          <EarnedCertificates certificates={dashboardData.certificates} userName={dashboardData.name} />
         </div>
       </main>
     </div>
