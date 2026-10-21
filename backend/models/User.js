@@ -10,8 +10,11 @@ const userSchema = new mongoose.Schema({
   scholarStatus: { type: String, default: 'Bronze Scholar' },
   weeklyGoal: {
     targetHours: { type: Number, default: 10 },
-    completedPercentage: { type: Number, default: 0 }
+    completedPercentage: { type: Number, default: 0 },
+    timeSpentSeconds: { type: Number, default: 0 }
   },
+  completedVideos: [{ type: String }],
+  completedPdfs: [{ type: String }],
   recentActivity: [{
     title: String,
     subtitle: String,

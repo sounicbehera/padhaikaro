@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { GET_DASHBOARD_DATA } from '../graphql/dashboardQueries';
 import Sidebar from '../components/layout/Sidebar';
@@ -7,6 +7,7 @@ import ProfileHeader from '../components/dashboard/ProfileHeader';
 import WeeklyGoal from '../components/dashboard/WeeklyGoal';
 import RecentActivity from '../components/dashboard/RecentActivity';
 import EarnedCertificates from '../components/dashboard/EarnedCertificates';
+import { getTimeSpentSeconds, getLocalPoints } from '../utils/tracker';
 
 const MOCK_DATA = {
   me: {
@@ -16,7 +17,8 @@ const MOCK_DATA = {
     scholarStatus: "Gold Scholar",
     weeklyGoal: {
       targetHours: 10,
-      completedPercentage: 85
+      completedPercentage: 85,
+      timeSpentSeconds: 0
     },
     recentActivity: [],
     certificates: []
@@ -24,23 +26,63 @@ const MOCK_DATA = {
 };
 
 const Dashboard = () => {
-  const { data } = useQuery(GET_DASHBOARD_DATA);
+  const { data, refetch } = useQuery(GET_DASHBOARD_DATA, {
+    fetchPolicy: 'cache-and-network'
+  });
+
+  const [localPoints, setLocalPoints] = useState(getLocalPoints());
+  const [localTimeSpent, setLocalTimeSpent] = useState(getTimeSpentSeconds());
+
+  useEffect(() => {
+    const handleTrackerChange = (e) => {
+      if (e.detail?.localPoints !== undefined) {
+        setLocalPoints(e.detail.localPoints);
+      }
+      if (e.detail?.timeSpentSeconds !== undefined) {
+        setLocalTimeSpent(e.detail.timeSpentSeconds);
+      }
+      refetch?.();
+    };
+
+    window.addEventListener('pk-tracker-update', handleTrackerChange);
+    return () => window.removeEventListener('pk-tracker-update', handleTrackerChange);
+  }, [refetch]);
   
   // Combine GraphQL certificates with locally earned ones
   const localCerts = JSON.parse(localStorage.getItem('earnedCertificates') || '[]');
   const allCertificates = [...(data?.me?.certificates || []), ...localCerts];
 
-  // Use GraphQL data if available, otherwise fallback to mock data
+  // Calculate points: if user is logged in, use their points from DB. If guest/fallback, start with 1250 + localPoints.
+  let totalPoints = 0;
+  if (data?.me) {
+    totalPoints = data.me.points !== undefined && data.me.points !== null ? data.me.points : 0;
+  } else {
+    totalPoints = MOCK_DATA.me.points + localPoints;
+  }
+
+  // Calculate weekly goal
+  const weeklyGoalData = data?.me?.weeklyGoal ? {
+    ...data.me.weeklyGoal,
+    timeSpentSeconds: Math.max(data.me.weeklyGoal.timeSpentSeconds || 0, localTimeSpent)
+  } : {
+    ...MOCK_DATA.me.weeklyGoal,
+    timeSpentSeconds: localTimeSpent
+  };
+
+  // Build dashboard data
   const dashboardData = data?.me ? {
     ...MOCK_DATA.me,
     ...data.me,
-    points: data.me.points ?? MOCK_DATA.me.points,
-    scholarStatus: data.me.scholarStatus ?? MOCK_DATA.me.scholarStatus,
-    weeklyGoal: data.me.weeklyGoal ?? MOCK_DATA.me.weeklyGoal,
+    points: totalPoints,
+    scholarStatus: data.me.scholarStatus || (totalPoints >= 1000 ? 'Diamond Scholar' : totalPoints >= 500 ? 'Gold Scholar' : 'Silver Scholar'),
+    weeklyGoal: weeklyGoalData,
     recentActivity: data.me.recentActivity || [],
     certificates: allCertificates,
   } : {
     ...MOCK_DATA.me,
+    points: totalPoints,
+    scholarStatus: totalPoints >= 1000 ? 'Diamond Scholar' : totalPoints >= 500 ? 'Gold Scholar' : 'Silver Scholar',
+    weeklyGoal: weeklyGoalData,
     certificates: localCerts
   };
 

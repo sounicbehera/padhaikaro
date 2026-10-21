@@ -1,10 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
 import ChatWidget from '../components/ChatWidget';
 import AdaptiveVideoPlayer from '../components/AdaptiveVideoPlayer';
-import { Play, PlayCircle, FileText, CheckCircle, Search, Bell, Settings, Calendar, LayoutDashboard, Menu, GraduationCap, MessageSquare } from 'lucide-react';
+import {
+  Play,
+  PlayCircle,
+  FileText,
+  CheckCircle,
+  Search,
+  Bell,
+  Settings,
+  Calendar,
+  LayoutDashboard,
+  Menu,
+  GraduationCap,
+  MessageSquare,
+  Sparkles
+} from 'lucide-react';
+import {
+  isVideoCompleted,
+  isPdfCompleted,
+  recordPdfCompletion
+} from '../utils/tracker';
 
 const getProcessedPdfUrl = (url) => {
   if (!url) return '';
@@ -38,6 +57,15 @@ const CoursePlayer = () => {
   const [activeLessonView, setActiveLessonView] = useState('video');
   const [activeTab, setActiveTab] = useState('Overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [trackerVersion, setTrackerVersion] = useState(0);
+
+  useEffect(() => {
+    const handleTrackerChange = () => {
+      setTrackerVersion((v) => v + 1);
+    };
+    window.addEventListener('pk-tracker-update', handleTrackerChange);
+    return () => window.removeEventListener('pk-tracker-update', handleTrackerChange);
+  }, []);
 
   if (loading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="text-primary text-xl">Loading course...</div></div>;
   if (error) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="text-error text-xl">Error loading course!</div></div>;
@@ -49,6 +77,18 @@ const CoursePlayer = () => {
   if (!activeLesson && course.modules.length > 0 && course.modules[0].lessons.length > 0) {
     setActiveLesson(course.modules[0].lessons[0]);
   }
+
+  const handleMarkPdfAsRead = async () => {
+    if (!activeLesson) return;
+    await recordPdfCompletion({
+      lessonId: activeLesson.id,
+      lessonTitle: activeLesson.title,
+      courseId: course.id
+    });
+    setTrackerVersion((v) => v + 1);
+  };
+
+  const isCurrentPdfCompleted = activeLesson ? isPdfCompleted(activeLesson.id) : false;
 
   return (
     <div className="bg-background text-on-background font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex w-full">
@@ -78,28 +118,53 @@ const CoursePlayer = () => {
                   <span className="truncate">{module.title}</span>
                 </h4>
                 <div className="space-y-0.5">
-                  {module.lessons?.map(lesson => (
-                    <div key={lesson.id} className="flex flex-col">
-                      <button
-                        onClick={() => { setActiveLesson(lesson); setActiveLessonView('video'); }}
-                        className={`w-full text-left flex items-center gap-2 p-2 rounded-md transition text-sm ${activeLesson?.id === lesson.id && activeLessonView === 'video' ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'}`}
-                      >
-                        {lesson.videoUrl ? <PlayCircle className="w-4 h-4 shrink-0" /> : <PlayCircle className="w-4 h-4 shrink-0 opacity-50" />}
-                        <span className="flex-1 truncate leading-tight">{lesson.title}</span>
-                        {lesson.duration && <span className="text-[10px] opacity-70 shrink-0">{lesson.duration}m</span>}
-                      </button>
-
-                      {lesson.pdfUrl && (
+                  {module.lessons?.map(lesson => {
+                    const isVideoDone = isVideoCompleted(lesson.id);
+                    const isPdfDone = isPdfCompleted(lesson.id);
+                    return (
+                      <div key={lesson.id} className="flex flex-col">
                         <button
-                          onClick={() => { setActiveLesson(lesson); setActiveLessonView('pdf'); }}
-                          className={`w-full text-left flex items-center gap-2 p-2 pl-6 rounded-md transition text-sm ${activeLesson?.id === lesson.id && activeLessonView === 'pdf' ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'}`}
+                          onClick={() => { setActiveLesson(lesson); setActiveLessonView('video'); }}
+                          className={`w-full text-left flex items-center gap-2 p-2 rounded-md transition text-sm ${activeLesson?.id === lesson.id && activeLessonView === 'video' ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'}`}
                         >
-                          <FileText className="w-4 h-4 shrink-0 text-secondary" />
-                          <span className="flex-1 truncate leading-tight">Course Material (PDF)</span>
+                          {isVideoDone ? (
+                            <CheckCircle className="w-4 h-4 shrink-0 text-emerald-400" />
+                          ) : lesson.videoUrl ? (
+                            <PlayCircle className="w-4 h-4 shrink-0" />
+                          ) : (
+                            <PlayCircle className="w-4 h-4 shrink-0 opacity-50" />
+                          )}
+                          <span className="flex-1 truncate leading-tight">{lesson.title}</span>
+                          {isVideoDone ? (
+                            <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-1 py-0.2 rounded font-bold shrink-0">
+                              +10pts
+                            </span>
+                          ) : (
+                            lesson.duration && <span className="text-[10px] opacity-70 shrink-0">{lesson.duration}m</span>
+                          )}
                         </button>
-                      )}
-                    </div>
-                  ))}
+
+                        {lesson.pdfUrl && (
+                          <button
+                            onClick={() => { setActiveLesson(lesson); setActiveLessonView('pdf'); }}
+                            className={`w-full text-left flex items-center gap-2 p-2 pl-6 rounded-md transition text-sm ${activeLesson?.id === lesson.id && activeLessonView === 'pdf' ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'}`}
+                          >
+                            {isPdfDone ? (
+                              <CheckCircle className="w-4 h-4 shrink-0 text-emerald-400" />
+                            ) : (
+                              <FileText className="w-4 h-4 shrink-0 text-secondary" />
+                            )}
+                            <span className="flex-1 truncate leading-tight">Course Material (PDF)</span>
+                            {isPdfDone && (
+                              <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-1 py-0.2 rounded font-bold shrink-0">
+                                +10pts
+                              </span>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -156,27 +221,75 @@ const CoursePlayer = () => {
 
             {/* Player Container */}
             {activeLessonView === 'pdf' ? (
-              <div className="w-full h-[500px] md:h-[700px] rounded-xl overflow-hidden border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)] bg-surface-container relative flex items-center justify-center">
-                {!activeLesson?.pdfUrl ? (
-                  <div className="text-on-surface-variant font-medium">No PDF material available for this lesson.</div>
-                ) : (
-                  <>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-on-surface-variant text-sm animate-pulse">Loading PDF Document...</span>
+              <div className="flex flex-col gap-3 w-full">
+                
+                {/* PDF Header with "Mark as Read" action */}
+                <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-container-high/90 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3 shadow-lg">
+                  <div className="flex items-center gap-2.5 overflow-hidden">
+                    <div className="p-2 rounded-lg bg-secondary/10 text-secondary">
+                      <FileText className="w-5 h-5" />
                     </div>
-                    <iframe
-                      src={getProcessedPdfUrl(activeLesson.pdfUrl)}
-                      title="Course PDF Material"
-                      className="w-full h-full border-none bg-white relative z-10"
-                    ></iframe>
-                  </>
-                )}
+                    <div>
+                      <h3 className="font-bold text-on-surface text-sm truncate">
+                        {activeLesson?.title || 'Lesson Course Material'}
+                      </h3>
+                      <span className="text-xs text-on-surface-variant">Course Material (PDF)</span>
+                    </div>
+                  </div>
+
+                  {/* Mark as Read Button */}
+                  {isCurrentPdfCompleted ? (
+                    <div className="flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-semibold px-4 py-2 rounded-lg text-sm shadow-sm">
+                      <CheckCircle className="w-4 h-4 text-emerald-400" />
+                      <span>Marked as Read</span>
+                      <span className="bg-emerald-500/25 text-emerald-300 text-xs px-2 py-0.5 rounded-full font-bold">
+                        Completed (+10 pts)
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleMarkPdfAsRead}
+                      className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium px-4 py-2 rounded-lg shadow-[0_4px_15px_rgba(16,185,129,0.35)] transition-all duration-200 active:scale-95 cursor-pointer text-sm group"
+                    >
+                      <CheckCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      <span>Mark as Read</span>
+                      <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                        +10 pts
+                      </span>
+                    </button>
+                  )}
+                </div>
+
+                {/* PDF Document Container */}
+                <div className="w-full h-[500px] md:h-[700px] rounded-xl overflow-hidden border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)] bg-surface-container relative flex items-center justify-center">
+                  {!activeLesson?.pdfUrl ? (
+                    <div className="text-on-surface-variant font-medium">No PDF material available for this lesson.</div>
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-on-surface-variant text-sm animate-pulse">Loading PDF Document...</span>
+                      </div>
+                      <iframe
+                        src={getProcessedPdfUrl(activeLesson.pdfUrl)}
+                        title="Course PDF Material"
+                        className="w-full h-full border-none bg-white relative z-10"
+                      ></iframe>
+                    </>
+                  )}
+                </div>
+
               </div>
             ) : (
               <div className="glass-panel rounded-xl overflow-hidden relative group shadow-[0_20px_40px_rgba(0,0,0,0.4)] aspect-video bg-black flex items-center justify-center">
                 {activeLesson?.videoUrl ? (
-                  <AdaptiveVideoPlayer rawUrl={activeLesson.videoUrl} title={activeLesson.title} />
+                  <AdaptiveVideoPlayer
+                    rawUrl={activeLesson.videoUrl}
+                    title={activeLesson.title}
+                    lessonId={activeLesson.id}
+                    courseId={course.id}
+                    onComplete={() => setTrackerVersion((v) => v + 1)}
+                  />
                 ) : (
                   <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCOllAnLqSBNQ-Wu14JynSqZ2nFyjPU8OAtcKb_SjC9O4MPOHJtGwJ5QZCRu1XVS1xHYUIjS94E50HGoUIBofnMWAG-xqFNG_8cetcV7SvlbTPo-BkwX9zKi3upK_cnO0EzQ3tH0foJCC9AaMlCBRoIvWVzZEynjpVF_I1S6Uv29-i5UTL0FL4aii_OmT30U4UE7g1ps5XL1QbLyZFmcitgSXfMJTJWHcT0FSxl-AMjVIoVqMFWRAIEAA')" }}></div>
                 )}

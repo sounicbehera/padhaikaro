@@ -2,6 +2,7 @@ const typeDefs = `#graphql
   type WeeklyGoal {
     targetHours: Int
     completedPercentage: Float
+    timeSpentSeconds: Int
   }
 
   type Activity {
@@ -38,6 +39,8 @@ const typeDefs = `#graphql
     recentActivity: [Activity]
     certificates: [Certificate]
     enrolledCourses: [Course]
+    completedVideos: [String]
+    completedPdfs: [String]
   }
 
   type Course {
@@ -150,6 +153,10 @@ const typeDefs = `#graphql
     markNotificationsAsRead: Boolean
     saveQuizzes(quizzes: [QuizInput]!): Boolean
     addCertificate(title: String!, issueDate: String, type: String): User
+    recordTimeSpent(seconds: Int!): User
+    completeVideoLesson(lessonId: ID!, courseId: ID): User
+    markPdfAsRead(lessonId: ID!, courseId: ID): User
+    addPoints(amount: Int!, reason: String): User
   }
 `;
 

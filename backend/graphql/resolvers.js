@@ -362,6 +362,140 @@ const resolvers = {
       }
       await user.save();
       return user;
+    },
+    recordTimeSpent: async (_, { seconds }, { user }) => {
+      checkAuth(user);
+      if (!user.weeklyGoal) {
+        user.weeklyGoal = { targetHours: 10, completedPercentage: 0, timeSpentSeconds: 0 };
+      }
+      const added = Math.max(0, parseInt(seconds, 10) || 0);
+      const currentSeconds = (user.weeklyGoal.timeSpentSeconds || 0) + added;
+      user.weeklyGoal.timeSpentSeconds = currentSeconds;
+
+      const targetHours = user.weeklyGoal.targetHours || 10;
+      const targetSeconds = targetHours * 3600;
+      const percentage = Math.min(100, Math.round(((currentSeconds / targetSeconds) * 100) * 10) / 10);
+      user.weeklyGoal.completedPercentage = percentage;
+
+      await user.save();
+      return user;
+    },
+    completeVideoLesson: async (_, { lessonId, courseId }, { user }) => {
+      checkAuth(user);
+      if (!user.completedVideos) user.completedVideos = [];
+      const lidStr = lessonId.toString();
+      const alreadyCompleted = user.completedVideos.includes(lidStr);
+
+      if (!alreadyCompleted) {
+        user.completedVideos.push(lidStr);
+        user.points = (user.points || 0) + 10;
+
+        if (user.points >= 1000) user.scholarStatus = 'Diamond Scholar';
+        else if (user.points >= 500) user.scholarStatus = 'Gold Scholar';
+        else if (user.points >= 200) user.scholarStatus = 'Silver Scholar';
+        else user.scholarStatus = 'Bronze Scholar';
+
+        let lessonTitle = 'Video Lesson';
+        try {
+          const lesson = await Lesson.findById(lessonId);
+          if (lesson && lesson.title) lessonTitle = lesson.title;
+        } catch (e) {}
+
+        if (!user.recentActivity) user.recentActivity = [];
+        user.recentActivity.unshift({
+          title: `Completed Video: ${lessonTitle}`,
+          subtitle: `Earned +10 Points (Video Watched)`,
+          type: 'video',
+          timeAgo: 'Just now'
+        });
+        if (user.recentActivity.length > 20) {
+          user.recentActivity = user.recentActivity.slice(0, 20);
+        }
+
+        if (courseId) {
+          try {
+            const enrollment = await Enrollment.findOne({ student: user._id, course: courseId });
+            if (enrollment && !enrollment.completedLessons.includes(lessonId)) {
+              enrollment.completedLessons.push(lessonId);
+              await enrollment.save();
+            }
+          } catch (e) {}
+        }
+
+        await user.save();
+      }
+
+      return user;
+    },
+    markPdfAsRead: async (_, { lessonId, courseId }, { user }) => {
+      checkAuth(user);
+      if (!user.completedPdfs) user.completedPdfs = [];
+      const lidStr = lessonId.toString();
+      const alreadyCompleted = user.completedPdfs.includes(lidStr);
+
+      if (!alreadyCompleted) {
+        user.completedPdfs.push(lidStr);
+        user.points = (user.points || 0) + 10;
+
+        if (user.points >= 1000) user.scholarStatus = 'Diamond Scholar';
+        else if (user.points >= 500) user.scholarStatus = 'Gold Scholar';
+        else if (user.points >= 200) user.scholarStatus = 'Silver Scholar';
+        else user.scholarStatus = 'Bronze Scholar';
+
+        let lessonTitle = 'PDF Material';
+        try {
+          const lesson = await Lesson.findById(lessonId);
+          if (lesson && lesson.title) lessonTitle = lesson.title;
+        } catch (e) {}
+
+        if (!user.recentActivity) user.recentActivity = [];
+        user.recentActivity.unshift({
+          title: `Read PDF: ${lessonTitle}`,
+          subtitle: `Earned +10 Points (Marked as Read)`,
+          type: 'pdf',
+          timeAgo: 'Just now'
+        });
+        if (user.recentActivity.length > 20) {
+          user.recentActivity = user.recentActivity.slice(0, 20);
+        }
+
+        if (courseId) {
+          try {
+            const enrollment = await Enrollment.findOne({ student: user._id, course: courseId });
+            if (enrollment && !enrollment.completedLessons.includes(lessonId)) {
+              enrollment.completedLessons.push(lessonId);
+              await enrollment.save();
+            }
+          } catch (e) {}
+        }
+
+        await user.save();
+      }
+
+      return user;
+    },
+    addPoints: async (_, { amount, reason }, { user }) => {
+      checkAuth(user);
+      user.points = (user.points || 0) + amount;
+      if (user.points >= 1000) user.scholarStatus = 'Diamond Scholar';
+      else if (user.points >= 500) user.scholarStatus = 'Gold Scholar';
+      else if (user.points >= 200) user.scholarStatus = 'Silver Scholar';
+      else user.scholarStatus = 'Bronze Scholar';
+
+      if (reason) {
+        if (!user.recentActivity) user.recentActivity = [];
+        user.recentActivity.unshift({
+          title: reason,
+          subtitle: `Earned +${amount} Points`,
+          type: 'points',
+          timeAgo: 'Just now'
+        });
+        if (user.recentActivity.length > 20) {
+          user.recentActivity = user.recentActivity.slice(0, 20);
+        }
+      }
+      await user.save();
+      return user;
     }
   },
   // Type resolvers to map Mongoose _id to GraphQL id

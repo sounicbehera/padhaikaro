@@ -13,6 +13,8 @@ import AdminCourseEditor from './pages/AdminCourseEditor';
 import AdminQuizManager from './pages/AdminQuizManager';
 import Dashboard from './pages/Dashboard';
 import QuizPage from './pages/QuizPage';
+import { initTimeTracker } from './utils/tracker';
+import PointToast from './components/PointToast';
 
 const Navbar = () => {
   const token = sessionStorage.getItem('token');
@@ -184,6 +186,10 @@ const AppLayout = () => {
   const location = useLocation();
   const isFullPage = location.pathname.startsWith('/course/') || location.pathname.startsWith('/quiz/') || location.pathname === '/auth' || location.pathname === '/';
 
+  useEffect(() => {
+    initTimeTracker();
+  }, []);
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-background text-on-background">
       {!isFullPage && <Navbar />}
@@ -200,6 +206,7 @@ const AppLayout = () => {
           <Route path="/admin/course/:slug" element={<AdminCourseEditor />} />
         </Routes>
       </main>
+      <PointToast />
     </div>
   );
 };
