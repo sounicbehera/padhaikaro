@@ -264,11 +264,19 @@ const resolvers = {
       // Add to user's enrolledCourses
       await User.findByIdAndUpdate(user._id, { $push: { enrolledCourses: courseId } });
 
-      return enrollment.populate('course').populate('student');
+      await enrollment.populate([
+        {
+          path: 'course',
+          populate: { path: 'instructor' }
+        },
+        { path: 'student' }
+      ]);
+      return enrollment;
     },
     markLessonComplete: async (_, { enrollmentId, lessonId }, { user }) => {
       checkAuth(user);
-      const enrollment = await Enrollment.findById(enrollmentId).populate('course');
+      const enrollment = await Enrollment.findById(enrollmentId);
+      if (!enrollment) throw new Error('Enrollment not found');
       if (enrollment.student.toString() !== user._id.toString()) throw new Error('Unauthorized');
       
       if (!enrollment.completedLessons.includes(lessonId)) {
@@ -278,7 +286,15 @@ const resolvers = {
       // Calculate progress (simplified, assumes total lessons count is known or fetched)
       // Here we just add it. A real system would calculate percentage based on total course lessons.
       await enrollment.save();
-      return enrollment.populate('completedLessons');
+      await enrollment.populate([
+        {
+          path: 'course',
+          populate: { path: 'instructor' }
+        },
+        { path: 'student' },
+        { path: 'completedLessons' }
+      ]);
+      return enrollment;
     },
     uploadAvatar: async (_, { base64Image }, { user }) => {
       checkAuth(user);
