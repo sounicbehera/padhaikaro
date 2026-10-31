@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
 import { Send } from 'lucide-react';
+import ChatMessageContent from './ChatMessageContent';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 const socket = io(API_URL);
@@ -79,8 +80,8 @@ const ChatWidget = ({ courseId, userName }) => {
                 {msg.user} {msg.isBot && ' (AI TA)'}
               </span>
             </div>
-            <div className={`mt-1 rounded-lg py-2 px-3 inline-block self-start max-w-[90%] ${msg.isBot || msg.user === 'Masterji' ? 'bg-brand-50 border border-brand-200' : 'bg-gray-100'}`}>
-              <span className="text-sm text-gray-800 whitespace-pre-wrap">{msg.message}</span>
+            <div className={`mt-1 rounded-lg py-2.5 px-3.5 inline-block self-start max-w-[95%] sm:max-w-[90%] ${msg.isBot || msg.user === 'Masterji' ? 'bg-brand-50 border border-brand-200 shadow-sm' : 'bg-gray-100'}`}>
+              <ChatMessageContent content={msg.message} isBot={msg.isBot || msg.user === 'Masterji'} />
             </div>
           </div>
         ))}
@@ -99,7 +100,7 @@ const ChatWidget = ({ courseId, userName }) => {
           type="text" 
           value={input} 
           onChange={(e) => setInput(e.target.value)} 
-          placeholder="Ask a question..."
+          placeholder="Type @masterji to chat with Ai"
           className="flex-1 rounded-md border-gray-300 shadow-sm p-2 text-sm text-black focus:border-brand-500 focus:ring-brand-500"
         />
         <button type="submit" className="p-2 bg-brand-600 text-white rounded-md hover:bg-brand-700">
