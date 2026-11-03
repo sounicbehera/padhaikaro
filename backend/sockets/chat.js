@@ -20,7 +20,10 @@ module.exports = (io) => {
     });
 
     socket.on('send_message', async (data) => {
-      const { courseId, user, message, timestamp } = data;
+      const { courseId, user, message, timestamp } = data || {};
+      if (!courseId || !message) return;
+      socket.join(`course_${courseId}`);
+      console.log(`[Chat] Room course_${courseId} from ${user}: ${message}`);
 
       io.to(`course_${courseId}`).emit('receive_message', { user, message, timestamp });
 

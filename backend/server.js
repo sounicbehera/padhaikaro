@@ -18,7 +18,7 @@ const httpServer = createServer(app);
 // Socket.io setup
 const io = new Server(httpServer, {
   cors: {
-    origin: ['https://padhaikarolms.netlify.app', 'http://localhost:5173'], 
+    origin: ['https://padhaikarolms.netlify.app', 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174', 'http://localhost:3000'], 
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -27,10 +27,14 @@ setupSockets(io);
 
 // Middleware
 app.use(cors({
-  origin: ['https://padhaikarolms.netlify.app', 'http://localhost:5173'],
+  origin: ['https://padhaikarolms.netlify.app', 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174', 'http://localhost:3000'],
   credentials: true
 }));
-app.use(express.json({ limit: '500mb' }));
+app.use(express.json({ limit: '10kb' }));
+app.use((req, res, next) => {
+  if (!req.body) req.body = {};
+  next();
+});
 
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/lms';
